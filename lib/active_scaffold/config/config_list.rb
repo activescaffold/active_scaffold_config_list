@@ -1,8 +1,9 @@
 module ActiveScaffold::Config
-  class ConfigList < Form
+  class ConfigList < Base
     self.crud_type = :read
     def initialize(*args)
       super
+      @link = self.class.link.clone unless self.class.link.nil?
     end
 
     # global level configuration
@@ -27,8 +28,20 @@ module ActiveScaffold::Config
       @label ? as_(@label) : as_(:config_list_model, :model => @core.label.singularize)
     end
 
-    # if you do not want to show all columns as a default you may define same
+    # if you do not want to show all columns as a default you may define some
     # e.g. conf.config_list.default_columns = [:name, founded_on]
     attr_accessor :default_columns
+
+    # provides access to the list of columns specifically meant for the config_list to use
+    def columns
+      unless @columns # lazy evaluation
+        self.columns = @core.columns._inheritable
+        self.columns.exclude :created_on, :created_at, :updated_on, :updated_at, :as_marked
+        self.columns.exclude *@core.columns.collect{|c| c.name if c.polymorphic_association?}.compact
+      end
+      @columns
+    end
+    
+    public :columns=
   end
 end

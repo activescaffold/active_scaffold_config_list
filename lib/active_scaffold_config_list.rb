@@ -2,9 +2,6 @@ require 'active_scaffold_config_list/engine'
 require 'active_scaffold_config_list/version'
 
 module ActiveScaffoldConfigList
-  def self.root
-    File.dirname(__FILE__) + "/.."
-  end
 end
 
 module ActiveScaffold

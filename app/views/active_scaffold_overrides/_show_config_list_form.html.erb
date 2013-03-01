@@ -2,7 +2,7 @@
 <%=
 options = {:id => element_form_id(:action => :config_list),
            :class => "as_form config_list",
-           :remote => true,
+           :remote => request.xhr?,
            :method => :get,
            'data-loading' => true}
 form_tag url_options, options %>

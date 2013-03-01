@@ -43,5 +43,8 @@ module ActiveScaffold::Config
     end
     
     public :columns=
+    
+    # the ActionLink for this action
+    attr_accessor :link
   end
 end

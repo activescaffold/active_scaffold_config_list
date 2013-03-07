@@ -10,7 +10,7 @@ form_tag url_options, options %>
   <%= render :partial => 'show_config_list_form_body', :locals => { :columns => active_scaffold_config.config_list } %>
   <p class="form-footer">
     <%= submit_tag as_(:config_list), :class => "submit" %>
-    <%= link_to as_(:reset), url_for(url_options.merge(:config_list => '')), :class => 'as_cancel', :remote => true %>
+    <%= link_to as_(:reset), url_for(url_options.merge(:config_list => '')), :class => 'as_cancel', :remote => true, :data => {:refresh => true} %>
     <%= loading_indicator_tag(:action => :config_list) %>
   </p>
 </form>

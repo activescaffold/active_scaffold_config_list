@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    active_scaffold_config_list (3.2.0)
-      active_scaffold (>= 3.3.0.rc2)
+    active_scaffold_config_list (3.2.1)
+      active_scaffold (>= 3.3.0.rc3)
+      active_scaffold_sortable (>= 3.2.2)
 
 GEM
   remote: http://rubygems.org/
@@ -22,6 +23,8 @@ GEM
       sprockets (~> 2.2.1)
     active_scaffold (3.3.0.rc3)
       rails (~> 3.2.0)
+    active_scaffold_sortable (3.2.2)
+      active_scaffold (>= 3.3.0.rc3)
     activemodel (3.2.12)
       activesupport (= 3.2.12)
       builder (~> 3.0.0)

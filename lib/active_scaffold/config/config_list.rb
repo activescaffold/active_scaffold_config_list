@@ -4,6 +4,7 @@ module ActiveScaffold::Config
     def initialize(*args)
       super
       @link = self.class.link.clone unless self.class.link.nil?
+      @save_to_user = self.class.save_to_user
     end
 
     # global level configuration
@@ -21,6 +22,9 @@ module ActiveScaffold::Config
     cattr_accessor :plugin_directory
     @@plugin_directory = File.expand_path(__FILE__).match(%{(^.*)/lib/active_scaffold/config/config_list.rb})[1]
 
+    # configures the method in user model to save list configuration for every controller
+    cattr_accessor :save_to_user
+
     # instance-level configuration
     # ----------------------------
     # the label= method already exists in the Form base class
@@ -31,6 +35,9 @@ module ActiveScaffold::Config
     # if you do not want to show all columns as a default you may define some
     # e.g. conf.config_list.default_columns = [:name, founded_on]
     attr_accessor :default_columns
+
+    # configures the method in user model to save list configuration for every controller
+    attr_accessor :save_to_user
 
     # provides access to the list of columns specifically meant for the config_list to use
     def columns

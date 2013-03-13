@@ -2,7 +2,7 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_filter :store_config_list_params_into_session, :only => [:index]
+      base.before_filter :store_config_list_params, :only => [:index]
       base.helper_method :config_list_params
     end
 
@@ -19,20 +19,44 @@ module ActiveScaffold::Actions
     
     protected
 
-    def store_config_list_params_into_session
+    def store_config_list_params
       if params[:config_list]
-        active_scaffold_session_storage[:config_list] = params.delete :config_list
-        case active_scaffold_session_storage[:config_list]
+        config_list = params.delete :config_list
+        case config_list
         when String
-          active_scaffold_session_storage[:config_list] = nil
+          delete_config_list_params
         when Array
-          active_scaffold_session_storage[:config_list].collect!{|col_name| col_name.to_sym}
+          save_config_list_params(config_list)
         end
       end
     end
 
+    def delete_config_list_params
+      if active_scaffold_config.config_list.save_to_user && current_user
+        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).destroy
+      else
+        active_scaffold_session_storage[:config_list] = nil
+      end
+      @config_list_params = nil
+    end
+
+    def save_config_list_params(config_list)
+      if active_scaffold_config.config_list.save_to_user && current_user
+        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).update_attribute :config_list, config_list.join(',')
+      else
+        active_scaffold_session_storage[:config_list] = config_list.map(&:to_sym)
+      end
+      @config_list_params = config_list.map(&:to_sym)
+    end
+
     def config_list_params
-      active_scaffold_session_storage[:config_list] || active_scaffold_config.config_list.default_columns
+      @config_list_params = if active_scaffold_config.config_list.save_to_user && current_user
+        params = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).config_list
+        params.split(',').map(&:to_sym) if params
+      else
+        active_scaffold_session_storage[:config_list]
+      end unless defined? @config_list_params
+      @config_list_params || active_scaffold_config.config_list.default_columns
     end
 
     def list_columns

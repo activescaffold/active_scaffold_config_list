@@ -1,5 +1,4 @@
-This works with Rails 3 and rails 3 fork of ActiveScaffold:
-http://github.com/vhochstein/active_scaffold
+This works with Rails 3.2 and ActiveScaffold >= 3.3
 
 Usage:
 active_scaffold :model do |conf|
@@ -11,18 +10,16 @@ Overview
 
 A plugin for Active Scaffold that provides the ability to choose the column to show in the scaffold list at run-time
 
-The configuration data will be saved on the session.
+The configuration data will be saved on the session. It can be saved on the DB defining a method to return a record
+for current controller, or empty record if user has no list configuration, and setting config_list to use that method.
 
+conf.config_list.save_to_user = :config_list_for
 
-Rails 3.0 Gem:
-gem 'active_scaffold_config_list_vho'
-or
-gem 'active_scaffold_config_list_vho', :git => 'git://github.com/vhochstein/active_scaffold_config_list.git', :branch => 'rails-3.0'
+class User < ActiveRecord::Base
+  has_many :list_configurations
+  def config_list_for(controller_id)
+    list_configurations.where(:controller_id => controller_id).first_or_initialize
+  end
+end
 
-Rails 3.1 Gem:
-gem 'active_scaffold_config_list_vho'
-or
-gem 'active_scaffold_config_list_vho', :git => 'git://github.com/vhochstein/active_scaffold_config_list.git'
-
-
-
+The model storing list configuration must have a config_list attribute storing the config list.

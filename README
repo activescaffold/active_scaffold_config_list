@@ -17,8 +17,9 @@ conf.config_list.save_to_user = :config_list_for
 
 class User < ActiveRecord::Base
   has_many :list_configurations
-  def config_list_for(controller_id)
-    list_configurations.where(:controller_id => controller_id).first_or_initialize
+  def config_list_for(controller_id, controller_name)
+    list_configurations.where(:controller_id => controller_id).first_or_initialize # different columns on different nested or embedded conditions
+    list_configurations.where(:controller_id => controller_name).first_or_initialize # one configuration for the controller, even embedded or nested
   end
 end
 

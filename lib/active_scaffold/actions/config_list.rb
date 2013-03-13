@@ -33,7 +33,7 @@ module ActiveScaffold::Actions
 
     def delete_config_list_params
       if active_scaffold_config.config_list.save_to_user && current_user = send(ActiveRecordPermissions.current_user_method)
-        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).destroy
+        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
       else
         active_scaffold_session_storage[:config_list] = nil
       end
@@ -42,7 +42,7 @@ module ActiveScaffold::Actions
 
     def save_config_list_params(config_list)
       if active_scaffold_config.config_list.save_to_user && current_user = send(ActiveRecordPermissions.current_user_method)
-        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).update_attribute :config_list, config_list.join(',')
+        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).update_attribute :config_list, config_list.join(',')
       else
         active_scaffold_session_storage[:config_list] = config_list.map(&:to_sym)
       end
@@ -51,7 +51,7 @@ module ActiveScaffold::Actions
 
     def config_list_params
       @config_list_params = if active_scaffold_config.config_list.save_to_user && current_user = send(ActiveRecordPermissions.current_user_method)
-        params = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key).config_list
+        params = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).config_list
         params.split(',').map(&:to_sym) if params
       else
         active_scaffold_session_storage[:config_list]

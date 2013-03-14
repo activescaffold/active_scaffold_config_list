@@ -60,12 +60,14 @@ module ActiveScaffold::Actions
     end
 
     def list_columns
-      columns = super
-      if !config_list_params.nil? && config_list_params.is_a?(Array)
-        config_list = Hash[config_list_params.each_with_index.map]
-        columns.select{|column| config_list.include? column.name}.sort{|x,y| config_list[x.name] <=> config_list[y.name]}
-      else
-        columns
+      @list_columns ||= begin
+        columns = super
+        if !config_list_params.nil? && config_list_params.is_a?(Array)
+          config_list = Hash[config_list_params.each_with_index.map]
+          columns.select{|column| config_list.include? column.name}.sort{|x,y| config_list[x.name] <=> config_list[y.name]}
+        else
+          columns
+        end
       end
     end
 

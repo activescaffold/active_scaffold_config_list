@@ -63,7 +63,7 @@ module ActiveScaffold::Actions
       @list_columns ||= begin
         columns = super
         if !config_list_params.nil? && config_list_params.is_a?(Array)
-          config_list = Hash[config_list_params.each_with_index.map]
+          config_list = Hash[config_list_params.each_with_index.map{|c,i| [c,i]}]
           columns.select{|column| config_list.include? column.name}.sort{|x,y| config_list[x.name] <=> config_list[y.name]}
         else
           columns

@@ -49,9 +49,19 @@ module ActiveScaffold::Actions
       @config_list_params = config_list.map(&:to_sym)
     end
 
+    def config_list_record
+      return @config_list_record if defined? @config_list_record
+      @config_list_record = if active_scaffold_config.config_list.save_to_user
+        current_user = send(ActiveRecordPermissions.current_user_method)
+        if current_user
+          current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+        end
+      end
+    end
+
     def config_list_params
-      @config_list_params = if active_scaffold_config.config_list.save_to_user && current_user = send(ActiveRecordPermissions.current_user_method)
-        params = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).config_list
+      @config_list_params = if config_list_record 
+        params = config_list_record.config_list
         params.split(',').map(&:to_sym) if params
       else
         active_scaffold_session_storage[:config_list]

@@ -49,6 +49,16 @@ module ActiveScaffold::Actions
       @config_list_params = config_list.map(&:to_sym)
     end
 
+    def objects_for_etag
+      # only override when list_columns is called, so 
+      if @list_columns && config_list_record
+        @last_modified = [@last_modified, config_list_record.updated_at].compact.maximum if config_list_record.respond_to? :updated_at
+        [super, config_list_record]
+      else
+        super
+      end
+    end
+
     def config_list_record
       return @config_list_record if defined? @config_list_record
       @config_list_record = if active_scaffold_config.config_list.save_to_user
@@ -72,7 +82,7 @@ module ActiveScaffold::Actions
     def list_columns
       @list_columns ||= begin
         columns = super
-        if !config_list_params.nil? && config_list_params.is_a?(Array)
+        if config_list_params.present?
           config_list = Hash[config_list_params.each_with_index.map{|c,i| [c,i]}]
           columns.select{|column| config_list.include? column.name}.sort{|x,y| config_list[x.name] <=> config_list[y.name]}
         else

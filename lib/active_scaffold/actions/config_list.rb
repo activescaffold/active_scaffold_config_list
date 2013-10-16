@@ -53,7 +53,12 @@ module ActiveScaffold::Actions
       # only override when list_columns is called, so 
       if @list_columns && config_list_record
         @last_modified = [@last_modified, config_list_record.updated_at].compact.maximum if config_list_record.respond_to? :updated_at
-        [super, config_list_record]
+        objects = super
+        if objects.is_a? Hash
+          objects.merge(:etag => [objects[:etag], config_list_record])
+        else
+          [objects, config_list_record]
+        end
       else
         super
       end

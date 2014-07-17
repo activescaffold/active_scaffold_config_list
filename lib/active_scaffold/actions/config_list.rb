@@ -4,7 +4,17 @@ module ActiveScaffold::Actions
     def self.included(base)
       base.before_filter :store_config_list_params, :only => [:index]
       base.helper_method :config_list_params
-      base.cattr_accessor :config_list_session_storage_method
+      base.extend ClassMethods
+    end
+
+    module ClassMethods
+      def config_list_session_storage_method
+        @config_list_session_storage_method
+      end
+
+      def config_list_session_storage_method=(value)
+        @config_list_session_storage_method = value
+      end
     end
 
     def show_config_list
@@ -33,7 +43,7 @@ module ActiveScaffold::Actions
     end
 
     def config_list_session_storage_method
-      respond_to? :custom_config_list_session_storage ? :custom_config_list_session_storage : :active_scaffold_session_storage
+      respond_to?(:custom_config_list_session_storage) ? :custom_config_list_session_storage : :active_scaffold_session_storage
     end
 
     def config_list_session_storage

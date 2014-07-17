@@ -84,8 +84,6 @@ module ActiveScaffold::Actions
       end
     end
 
-    config
-
     def config_list_params
       @config_list_params = if config_list_record 
         params = config_list_record.config_list

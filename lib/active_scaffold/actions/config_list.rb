@@ -31,11 +31,15 @@ module ActiveScaffold::Actions
       end
     end
 
+    def config_list_session_storage
+      active_scaffold_session_storage
+    end
+
     def delete_config_list_params
       if active_scaffold_config.config_list.save_to_user && current_user = send(active_scaffold_config.class.security.current_user_method)
         current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
       else
-        active_scaffold_session_storage[:config_list] = nil
+        config_list_session_storage[:config_list] = nil
       end
       @config_list_params = nil
     end
@@ -44,7 +48,7 @@ module ActiveScaffold::Actions
       if active_scaffold_config.config_list.save_to_user && current_user = send(active_scaffold_config.class.security.current_user_method)
         current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).update_attribute :config_list, config_list.join(',')
       else
-        active_scaffold_session_storage[:config_list] = config_list.map(&:to_sym)
+        config_list_session_storage[:config_list] = config_list.map(&:to_sym)
       end
       @config_list_params = config_list.map(&:to_sym)
     end
@@ -74,12 +78,14 @@ module ActiveScaffold::Actions
       end
     end
 
+    config
+
     def config_list_params
       @config_list_params = if config_list_record 
         params = config_list_record.config_list
         params.split(',').map(&:to_sym) if params
       else
-        active_scaffold_session_storage[:config_list]
+        config_list_session_storage[:config_list]
       end unless defined? @config_list_params
       @config_list_params || active_scaffold_config.config_list.default_columns
     end

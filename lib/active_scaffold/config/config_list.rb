@@ -5,6 +5,7 @@ module ActiveScaffold::Config
       super
       @link = self.class.link.clone unless self.class.link.nil?
       @save_to_user = self.class.save_to_user
+      @draggable = self.class.draggable
     end
 
     # global level configuration
@@ -20,10 +21,14 @@ module ActiveScaffold::Config
 
     # configures where the plugin itself is located. there is no instance version of this.
     cattr_accessor :plugin_directory
-    @@plugin_directory = File.expand_path(__FILE__).match(%{(^.*)/lib/active_scaffold/config/config_list.rb})[1]
+    self.plugin_directory = File.expand_path(__FILE__).match(%{(^.*)/lib/active_scaffold/config/config_list.rb})[1]
 
     # configures the method in user model to save list configuration for every controller
     cattr_accessor :save_to_user
+
+    # enable draggable lists to select displayed columns (enabled by default)
+    cattr_accessor :draggable
+    self.draggable = true
 
     # instance-level configuration
     # ----------------------------
@@ -38,6 +43,9 @@ module ActiveScaffold::Config
 
     # configures the method in user model to save list configuration for every controller
     attr_accessor :save_to_user
+
+    # enable draggable lists to select displayed columns
+    attr_accessor :draggable
 
     # provides access to the list of columns specifically meant for the config_list to use
     def columns

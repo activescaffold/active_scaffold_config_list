@@ -2,8 +2,8 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_filter :store_config_list_params, :only => [:index]
-      base.helper_method :config_list_params
+      base.before_filter :store_config_list_params, :set_default_sorting, :only => [:index]
+      base.helper_method :config_list_params, :config_list_sorting
       base.extend ClassMethods
     end
 
@@ -29,6 +29,12 @@ module ActiveScaffold::Actions
     end
     
     protected
+    
+    def set_default_sorting
+      unless active_scaffold_config.list.user['sort'] || (params['sort'] and params['sort_direction'])
+        active_scaffold_config.list.user.sorting.set *config_list_sorting if config_list_sorting
+      end
+    end
 
     def store_config_list_params
       if params[:config_list]
@@ -37,8 +43,16 @@ module ActiveScaffold::Actions
         when String
           delete_config_list_params
         when Array
-          save_config_list_params(config_list)
+          save_config_list_params(config_list, config_list_sorting_params)
         end
+      end
+    end
+    
+    def config_list_sorting_params
+      sorting_params = params.delete(:config_list_sorting)
+      if sorting_params
+        sorting_params = sorting_params.values.select{ |c,d| c.present? && d.present? }
+        sorting_params if sorting_params.present?
       end
     end
 
@@ -56,17 +70,26 @@ module ActiveScaffold::Actions
         current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
       else
         config_list_session_storage['config_list'] = nil
+        config_list_session_storage['config_list_sorting'] = nil
       end
+      active_scaffold_config.list.user['sort'] = nil
+      logger.debug "list #{active_scaffold_config.list.sorting.object_id}"
       @config_list_params = nil
+      @config_list_sorting = nil
     end
 
-    def save_config_list_params(config_list)
+    def save_config_list_params(config_list, config_list_sorting)
       if active_scaffold_config.config_list.save_to_user && current_user = send(active_scaffold_config.class.security.current_user_method)
-        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).update_attribute :config_list, config_list.join(',')
+        record = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+        record.config_list = config_list.join(',')
+        record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
+        record.save
       else
         config_list_session_storage['config_list'] = config_list.map(&:to_sym)
+        config_list_session_storage['config_list_sorting'] = config_list_sorting
       end
       @config_list_params = config_list.map(&:to_sym)
+      @config_list_sorting = config_list_sorting
     end
 
     def objects_for_etag
@@ -102,6 +125,15 @@ module ActiveScaffold::Actions
         config_list_session_storage['config_list']
       end unless defined? @config_list_params
       @config_list_params || active_scaffold_config.config_list.default_columns
+    end
+
+    def config_list_sorting
+      @config_list_sorting = if config_list_record 
+        config_list_record.config_list_sorting if config_list_record.respond_to? :config_list_sorting
+      else
+        config_list_session_storage['config_list_sorting']
+      end unless defined? @config_list_sorting
+      @config_list_sorting
     end
 
     def list_columns

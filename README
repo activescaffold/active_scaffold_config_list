@@ -1,4 +1,5 @@
-This works with Rails 3.2 and ActiveScaffold >= 3.3
+This works with Rails 3.2 and ActiveScaffold >= 3.4.4
+Version 3.2.x worked with Rails 3.2 and ActiveScaffold >= 3.3.0
 
 Usage:
 active_scaffold :model do |conf|
@@ -23,4 +24,4 @@ class User < ActiveRecord::Base
   end
 end
 
-The model storing list configuration must have a config_list attribute storing the config list.
+The model storing list configuration must have a config_list text column storing the config list, and config_list_sort serialized text column.

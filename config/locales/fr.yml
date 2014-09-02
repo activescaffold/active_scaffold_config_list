@@ -1,0 +1,6 @@
+fr: 
+  active_scaffold: 
+    config_list: Configurer
+    config_list_model: "Configurer les colonnes pour %{model}"
+    columns: Columns
+    default_sorting: Default Sorting

@@ -1,6 +1,6 @@
 <ol class="form">
   <li class="form-element">
-    <dl><dt><label>Columns</label></dt>
+    <dl><dt><label><%= as_ :columns %></label></dt>
     <dd><ul class="<%= active_scaffold_config.config_list.draggable ? 'draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(:action => :config_list) %>-columns">
 <%
   if !config_list_params.nil? && config_list_params.is_a?(Array)
@@ -17,7 +17,7 @@
     </ul></dd></dl>
   </li>
   <li class="form-element">
-    <dl><dt><label>Default Sorting</label></dt>
+    <dl><dt><label><%= as_ :default_sorting %></label></dt>
     <dd><ol>
 <%
   columns_options = list_columns.select{|c| c.sortable?}.map{|c| [c.label, c.name]}

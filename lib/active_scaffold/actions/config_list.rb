@@ -31,7 +31,7 @@ module ActiveScaffold::Actions
     protected
     
     def set_default_sorting
-      unless active_scaffold_config.list.user['sort'] || (params['sort'] and params['sort_direction'])
+      if (params['sort_direction'] && params['sort_direction'] == 'reset') || (active_scaffold_config.list.user['sort'].blank? && params['sort'].blank?)
         active_scaffold_config.list.user.sorting.set *config_list_sorting if config_list_sorting
       end
     end

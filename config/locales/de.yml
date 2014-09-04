@@ -1,6 +1,8 @@
 de: 
-  active_scaffold: 
+  active_scaffold:
+    asc: asc
     config_list: Konfigurieren
     config_list_model: "Konfiguriere Spalten für %{model}"
     columns: Columns
     default_sorting: Default Sorting
+    desc: desc

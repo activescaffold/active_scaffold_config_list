@@ -1,6 +1,8 @@
 hu: 
   active_scaffold: 
+    asc: asc
     config_list: Configure
     config_list_model: "Configure Columns for %{model}"
     columns: Columns
     default_sorting: Default Sorting
+    desc: desc

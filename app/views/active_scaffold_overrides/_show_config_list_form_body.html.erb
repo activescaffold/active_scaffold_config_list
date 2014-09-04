@@ -21,7 +21,7 @@
     <dd><ol>
 <%
   columns_options = list_columns.select{|c| c.sortable?}.map{|c| [c.label, c.name]}
-  order_options = ['asc', 'desc']
+  order_options = ['asc', 'desc'].map{ |v| [as_(v), v] }
   selected = config_list_sorting || []
   3.times do |i|
 %>

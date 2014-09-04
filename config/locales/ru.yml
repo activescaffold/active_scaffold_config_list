@@ -1,6 +1,8 @@
 ru: 
   active_scaffold: 
+    asc: asc
     config_list: "Настройки списка"
     config_list_model: "%{model}: настройки списка"
     columns: Columns
     default_sorting: Default Sorting
+    desc: desc

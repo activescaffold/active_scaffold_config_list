@@ -48,16 +48,10 @@ module ActiveScaffold::Config
     attr_accessor :draggable
 
     # provides access to the list of columns specifically meant for the config_list to use
-    def columns
-      unless @columns # lazy evaluation
-        self.columns = @core.columns._inheritable
-        self.columns.exclude :created_on, :created_at, :updated_on, :updated_at, :as_marked
-        self.columns.exclude *@core.columns.collect{|c| c.name if c.polymorphic_association?}.compact
-      end
-      @columns
+    columns_accessor :columns do
+      columns.exclude :created_on, :created_at, :updated_on, :updated_at, :as_marked
+      columns.exclude *@core.columns.collect{|c| c.name if c.polymorphic_association?}.compact
     end
-    
-    public :columns=
     
     # the ActionLink for this action
     attr_accessor :link

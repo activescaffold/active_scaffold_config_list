@@ -34,7 +34,7 @@ module ActiveScaffold::Config
     # ----------------------------
     # the label= method already exists in the Form base class
     def label
-      @label ? as_(@label) : as_(:config_list_model, :model => @core.label)
+      @label ? as_(@label) : as_(:config_list_model, :model => @core.label(:count => 1))
     end
 
     # if you do not want to show all columns as a default you may define some

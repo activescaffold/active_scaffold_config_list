@@ -2,7 +2,7 @@ module ActiveScaffoldConfigList
   module Version
     MAJOR = 3
     MINOR = 3
-    PATCH = 2
+    PATCH = 3
 
     STRING = [MAJOR, MINOR, PATCH].compact.join('.')
   end

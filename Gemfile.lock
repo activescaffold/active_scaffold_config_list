@@ -27,7 +27,7 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    active_scaffold (3.4.39)
+    active_scaffold (3.4.41.1)
       rails (>= 3.2.22.2, < 5)
     active_scaffold_sortable (3.2.12)
       active_scaffold (>= 3.3.0.rc3)

@@ -65,9 +65,13 @@ module ActiveScaffold::Actions
       send(self.class.config_list_session_storage_method)
     end
 
+    def active_scaffold_current_user
+      @active_scaffold_current_user ||= send(self.class.active_scaffold_config.class.security.current_user_method)
+    end
+
     def delete_config_list_params
-      if active_scaffold_config.config_list.save_to_user && current_user = send(active_scaffold_config.class.security.current_user_method)
-        current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
+      if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
+        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
       else
         config_list_session_storage['config_list'] = nil
         config_list_session_storage['config_list_sorting'] = nil
@@ -79,8 +83,8 @@ module ActiveScaffold::Actions
     end
 
     def save_config_list_params(config_list, config_list_sorting)
-      if active_scaffold_config.config_list.save_to_user && current_user = send(active_scaffold_config.class.security.current_user_method)
-        record = current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+      if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
+        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
         record.config_list = config_list.join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
         record.save
@@ -110,9 +114,8 @@ module ActiveScaffold::Actions
     def config_list_record
       return @config_list_record if defined? @config_list_record
       @config_list_record = if active_scaffold_config.config_list.save_to_user
-        current_user = send(active_scaffold_config.class.security.current_user_method)
-        if current_user
-          current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+        if active_scaffold_current_user
+          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
         end
       end
     end

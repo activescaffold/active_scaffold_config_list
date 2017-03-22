@@ -22,4 +22,5 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency(%q<active_scaffold>, [">= 3.4.31"])
   s.add_runtime_dependency(%q<active_scaffold_sortable>, [">= 3.2.2"])
+  s.add_runtime_dependency('rails', '>= 4.0')
 end

@@ -2,7 +2,7 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_filter :store_config_list_params, :set_default_sorting, :only => [:index]
+      base.before_action :store_config_list_params, :set_default_sorting, :only => [:index]
       base.helper_method :config_list_params, :config_list_sorting
       base.extend ClassMethods
     end

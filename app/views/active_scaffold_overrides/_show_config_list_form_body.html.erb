@@ -5,7 +5,7 @@
 <%
   if !config_list_params.nil? && config_list_params.is_a?(Array)
     config_list = config_list_params
-    list_columns.concat active_scaffold_config.list.columns.collect_visible.select{|column| config_list.exclude? column.name}
+    list_columns.concat active_scaffold_config.list.columns.visible_columns.select{|column| config_list.exclude? column.name}
   end
 %>
 <% list_columns.each do |c| %>

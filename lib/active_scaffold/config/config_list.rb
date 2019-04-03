@@ -55,5 +55,9 @@ module ActiveScaffold::Config
     
     # the ActionLink for this action
     attr_accessor :link
+
+    UserSettings.class_eval do
+      user_attr :default_columns, :save_to_user, :draggable
+    end
   end
 end

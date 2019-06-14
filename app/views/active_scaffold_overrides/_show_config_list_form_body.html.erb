@@ -11,7 +11,7 @@
 <% list_columns.each do |c| %>
       <li class="sortable">
         <%= check_box_tag 'config_list[]', c.name.to_s, (config_list_params.nil? ? true : config_list_params.include?(c.name)), {:id => nil}%>
-        <label><%= c.label%></label>
+        <label><%= column_heading_label(c) %></label>
       </li>
 <% end %>
     </ul></dd></dl>

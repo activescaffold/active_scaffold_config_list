@@ -127,7 +127,11 @@ module ActiveScaffold::Actions
       else
         config_list_session_storage['config_list']
       end unless defined? @config_list_params
-      @config_list_params || active_scaffold_config.config_list.default_columns
+      @config_list_params || config_list_default_columns
+    end
+
+    def config_list_default_columns
+      active_scaffold_config.config_list.default_columns
     end
 
     def config_list_sorting

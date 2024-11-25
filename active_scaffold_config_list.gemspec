@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary = %q{User specific column configuration for ActiveScaffold}
   s.description = %q{User may reorder and hide/show list columns}
   s.require_paths = ["lib"]
-  s.files = `git ls-files -- app config lib`.split("\n") + %w[LICENSE.txt README]
+  s.files = `git ls-files -- app config lib`.split("\n") + %w[LICENSE.txt README.md]
   s.extra_rdoc_files = [
     "README"
   ]

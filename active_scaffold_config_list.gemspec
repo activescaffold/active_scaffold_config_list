@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.files = `git ls-files -- app config lib`.split("\n") + %w[LICENSE.txt README.md]
   s.extra_rdoc_files = [
-    "README"
+    "README.md"
   ]
   s.licenses = ["MIT"]
 

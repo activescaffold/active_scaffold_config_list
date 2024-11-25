@@ -4,17 +4,6 @@ module ActiveScaffold::Actions
     def self.included(base)
       base.before_action :store_config_list_params, :set_default_sorting, :only => [:index]
       base.helper_method :config_list_params, :config_list_sorting
-      base.extend ClassMethods
-    end
-
-    module ClassMethods
-      def config_list_session_storage_method
-        @config_list_session_storage_method
-      end
-
-      def config_list_session_storage_method=(value)
-        @config_list_session_storage_method = value
-      end
     end
 
     def show_config_list
@@ -57,12 +46,16 @@ module ActiveScaffold::Actions
     end
 
     def config_list_session_storage_method
-      respond_to?(:custom_config_list_session_storage) ? :custom_config_list_session_storage : :active_scaffold_session_storage
+      @config_list_session_storage_method ||=
+        if respond_to?(:custom_config_list_session_storage)
+          :custom_config_list_session_storage
+        else
+          :active_scaffold_session_storage
+        end
     end
 
     def config_list_session_storage
-      self.class.config_list_session_storage_method = self.config_list_session_storage_method unless self.class.config_list_session_storage_method
-      send(self.class.config_list_session_storage_method)
+      send(config_list_session_storage_method)
     end
 
     def active_scaffold_current_user
@@ -77,7 +70,6 @@ module ActiveScaffold::Actions
         config_list_session_storage['config_list_sorting'] = nil
       end
       active_scaffold_config.list.user['sort'] = nil
-      logger.debug "list #{active_scaffold_config.list.sorting.object_id}"
       @config_list_params = nil
       @config_list_sorting = nil
     end

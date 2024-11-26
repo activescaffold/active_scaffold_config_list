@@ -37,6 +37,14 @@ list configuration, and setting config_list to use that method.
 conf.config_list.save_to_user = :config_list_for
 ```
 
+It can be changed globally for the app in `ActiveScaffold.defaults` in an initializer, such as:
+
+```rb
+ActiveScaffold.defaults do |config|
+  config.config_list.save_to_user
+end
+```
+
 The model storing list configuration must have a config_list text column storing the columns list, and config_list_sort
 serialized text column. For example:
 

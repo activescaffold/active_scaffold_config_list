@@ -10,3 +10,4 @@ module ActiveScaffold
     ActiveScaffold.autoload_subdir('config', self, File.dirname(__FILE__))
   end
 end
+ActiveSupport.run_load_hooks(:active_scaffold_config_list)

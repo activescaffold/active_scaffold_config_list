@@ -1,7 +1,7 @@
 <ol class="form">
   <li class="form-element">
     <dl><dt><label><%= as_ :columns %></label></dt>
-    <dd><ul class="<%= active_scaffold_config.config_list.draggable ? 'draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(:action => :config_list) %>-columns">
+    <dd><ul class="<%= active_scaffold_config.config_list.draggable ? 'draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(action: :config_list) %>-columns">
 <%
   if !config_list_params.nil? && config_list_params.is_a?(Array)
     config_list = config_list_params
@@ -10,7 +10,7 @@
 %>
 <% list_columns.each do |c| %>
       <li class="sortable">
-        <%= check_box_tag 'config_list[]', c.name.to_s, (config_list_params.nil? ? true : config_list_params.include?(c.name)), {:id => nil}%>
+        <%= check_box_tag 'config_list[]', c.name.to_s, (config_list_params.nil? ? true : config_list_params.include?(c.name)), {id: nil}%>
         <label><%= column_heading_label(c) %></label>
       </li>
 <% end %>
@@ -25,8 +25,8 @@
   selected = config_list_sorting || []
   3.times do |i|
 %>
-      <li><%= select_tag "config_list_sorting[#{i}][]", options_for_select(columns_options, :selected => selected[i].try(:first)), :include_blank => as_(:_select_), :class => 'column' %>
-      <%= select_tag "config_list_sorting[#{i}][]", options_for_select(order_options, :selected => selected[i].try(:last)), :include_blank => as_(:_select_), :class => 'order' %></li>
+      <li><%= select_tag "config_list_sorting[#{i}][]", options_for_select(columns_options, selected: selected[i]&.first), include_blank: as_(:_select_), class: 'column' %>
+      <%= select_tag "config_list_sorting[#{i}][]", options_for_select(order_options, selected: selected[i]&.last), include_blank: as_(:_select_), class: 'order' %></li>
 <% end %>
     </ol></dd></dl>
   </li>

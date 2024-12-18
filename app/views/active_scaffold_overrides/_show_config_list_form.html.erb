@@ -1,16 +1,16 @@
-<% url_options = params_for(:action => :index, :escape => false, :config_list => nil) -%>
+<% url_options = params_for(action: :index, escape: false, config_list: nil) -%>
 <%=
-options = {:id => element_form_id(:action => :config_list),
-           :class => "as_form config_list",
-           :remote => request.xhr?,
-           :method => :get,
+options = {id: element_form_id(action: :config_list),
+           class: "as_form config_list",
+           remote: request.xhr?,
+           method: :get,
            'data-loading' => true}
 form_tag url_options, options %>
   <h4><%= active_scaffold_config.config_list.label -%></h4>
-  <%= render :partial => 'show_config_list_form_body' %>
+  <%= render 'show_config_list_form_body' %>
   <p class="form-footer">
-    <%= submit_tag as_(:config_list), :class => "submit" %>
-    <%= link_to as_(:reset), url_for(url_options.merge(:config_list => '')), :class => 'as_cancel', :remote => true, :data => {:refresh => true} %>
-    <%= loading_indicator_tag(:action => :config_list) %>
+    <%= submit_tag as_(:config_list), class: "submit" %>
+    <%= link_to as_(:reset), url_for(url_options.merge(config_list: '')), class: 'as_cancel', remote: true, data: {refresh: true} %>
+    <%= loading_indicator_tag(action: :config_list) %>
   </p>
 </form>

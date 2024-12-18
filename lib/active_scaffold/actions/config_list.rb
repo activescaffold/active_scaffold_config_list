@@ -2,17 +2,17 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_action :store_config_list_params, :set_default_sorting, :only => [:index]
+      base.before_action :store_config_list_params, :set_default_sorting, only: [:index]
       base.helper_method :config_list_params, :config_list_sorting
     end
 
     def show_config_list
       respond_to do |type|
         type.html do
-          render(:action => 'show_config_list_form', :layout => true)
+          render(action: 'show_config_list_form', layout: true)
         end
         type.js do
-          render(:partial => 'show_config_list_form', :layout => false)
+          render(partial: 'show_config_list_form', layout: false)
         end
       end
     end
@@ -58,13 +58,17 @@ module ActiveScaffold::Actions
       send(config_list_session_storage_method)
     end
 
+    def config_list_session_storage_key
+      active_scaffold_session_storage_key
+    end
+
     def active_scaffold_current_user
       @active_scaffold_current_user ||= send(self.class.active_scaffold_config.class.security.current_user_method)
     end
 
     def delete_config_list_params
       if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name).destroy
+        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name).destroy
       else
         config_list_session_storage['config_list'] = nil
         config_list_session_storage['config_list_sorting'] = nil
@@ -76,7 +80,7 @@ module ActiveScaffold::Actions
 
     def save_config_list_params(config_list, config_list_sorting)
       if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name)
         record.config_list = config_list.join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
         record.save
@@ -94,7 +98,7 @@ module ActiveScaffold::Actions
         @last_modified = [@last_modified, config_list_record.updated_at].compact.max if config_list_record.respond_to? :updated_at
         objects = super
         if objects.is_a? Hash
-          objects.merge(:etag => [objects[:etag], config_list_record])
+          objects.merge(etag: [objects[:etag], config_list_record])
         else
           [objects, config_list_record]
         end
@@ -105,20 +109,22 @@ module ActiveScaffold::Actions
 
     def config_list_record
       return @config_list_record if defined? @config_list_record
-      @config_list_record = if active_scaffold_config.config_list.save_to_user
-        if active_scaffold_current_user
-          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, active_scaffold_session_storage_key, controller_name)
+      @config_list_record =
+        if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
+          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name)
         end
-      end
     end
 
     def config_list_params
-      @config_list_params = if config_list_record 
-        params = config_list_record.config_list
-        params.split(',').map(&:to_sym) if params
-      else
-        config_list_session_storage['config_list']
-      end unless defined? @config_list_params
+      unless defined? @config_list_params
+        @config_list_params =
+          if config_list_record
+            params = config_list_record.config_list
+            params.split(',').map(&:to_sym) if params
+          else
+            config_list_session_storage['config_list']
+          end
+      end
       @config_list_params || config_list_default_columns
     end
 
@@ -127,11 +133,14 @@ module ActiveScaffold::Actions
     end
 
     def config_list_sorting
-      @config_list_sorting = if config_list_record 
-        config_list_record.config_list_sorting if config_list_record.respond_to? :config_list_sorting
-      else
-        config_list_session_storage['config_list_sorting']
-      end unless defined? @config_list_sorting
+      unless defined? @config_list_sorting
+        @config_list_sorting =
+          if config_list_record
+            config_list_record.config_list_sorting if config_list_record.respond_to? :config_list_sorting
+          else
+            config_list_session_storage['config_list_sorting']
+          end
+      end
       @config_list_sorting
     end
 
@@ -139,8 +148,9 @@ module ActiveScaffold::Actions
       @list_columns ||= begin
         columns = super
         if config_list_params.present?
-          config_list = Hash[config_list_params.each_with_index.map{|c,i| [c,i]}]
-          columns.select{|column| config_list.include? column.name}.sort{|x,y| config_list[x.name] <=> config_list[y.name]}
+          config_list = config_list_params.each.with_index.to_h
+          columns.select { |column| config_list.include? column.name }.
+            sort { |x, y| config_list[x.name] <=> config_list[y.name] }
         else
           columns
         end
@@ -150,7 +160,7 @@ module ActiveScaffold::Actions
     # The default security delegates to ActiveRecordPermissions.
     # You may override the method to customize.
     def config_list_authorized?
-      authorized_for?(:action => :read)
+      authorized_for?(action: :read)
     end
   end
 end

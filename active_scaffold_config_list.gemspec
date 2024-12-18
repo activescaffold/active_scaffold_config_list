@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   ]
   s.licenses = ["MIT"]
 
+  s.required_ruby_version = '>= 2.5'
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
 
   s.add_runtime_dependency(%q<active_scaffold>, [">= 3.7.1"])

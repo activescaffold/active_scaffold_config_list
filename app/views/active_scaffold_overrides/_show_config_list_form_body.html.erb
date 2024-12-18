@@ -1,27 +1,24 @@
 <ol class="form">
+  <% if config_list_columns? %>
   <li class="form-element">
     <dl><dt><label><%= as_ :columns %></label></dt>
     <dd><ul class="<%= active_scaffold_config.config_list.draggable ? 'draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(action: :config_list) %>-columns">
-<%
-  if !config_list_params.nil? && config_list_params.is_a?(Array)
-    config_list = config_list_params
-    list_columns.concat active_scaffold_config.list.columns.visible_columns.select{|column| config_list.exclude? column.name}
-  end
-%>
-<% list_columns.each do |c| %>
+<% config_list_columns.each do |label, column| %>
       <li class="sortable">
-        <%= check_box_tag 'config_list[]', c.name.to_s, (config_list_params.nil? ? true : config_list_params.include?(c.name)), {id: nil}%>
-        <label><%= column_heading_label(c) %></label>
+        <%= check_box_tag 'config_list[]', column.to_s, (config_list_params.nil? ? true : config_list_params.include?(column)), {id: nil}%>
+        <label><%= label %></label>
       </li>
 <% end %>
     </ul></dd></dl>
   </li>
+  <% end %>
+  <% if config_list_sorting? %>
   <li class="form-element">
     <dl><dt><label><%= as_ :default_sorting %></label></dt>
     <dd><ol>
 <%
-  columns_options = list_columns.select{|c| c.sortable?}.map{|c| [c.label, c.name]}
-  order_options = ['asc', 'desc'].map{ |v| [as_(v), v] }
+  columns_options = list_columns.select(&:sortable?).map { |c| [c.label, c.name] }
+  order_options = ['asc', 'desc'].map { |v| [as_(v), v] }
   selected = config_list_sorting || []
   3.times do |i|
 %>
@@ -30,4 +27,5 @@
 <% end %>
     </ol></dd></dl>
   </li>
+  <% end %>
 </ol>

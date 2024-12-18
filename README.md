@@ -1,6 +1,7 @@
-This works with Rails >= 4.0 and ActiveScaffold >= 3.4.4
-Version 3.3.x worked with Rails 3.2 and ActiveScaffold >= 3.4.4
-Version 3.2.x worked with Rails 3.2 and ActiveScaffold >= 3.3.0
+This works with Rails >= 5.2 and ActiveScaffold >= 3.7.1  
+Version 3.4.x and 3.5.x worked with Rails >= 4.0 and ActiveScaffold >= 3.4.4  
+Version 3.3.x worked with Rails 3.2 and ActiveScaffold >= 3.4.4  
+Version 3.2.x worked with Rails 3.2 and ActiveScaffold >= 3.3.0  
 
 Usage:
 

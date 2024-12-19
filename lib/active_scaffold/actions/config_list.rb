@@ -62,13 +62,17 @@ module ActiveScaffold::Actions
       active_scaffold_session_storage_key
     end
 
+    def config_list_controller_name
+      controller_name
+    end
+
     def active_scaffold_current_user
       @active_scaffold_current_user ||= send(self.class.active_scaffold_config.class.security.current_user_method)
     end
 
     def delete_config_list_params
       if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name).destroy
+        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name).destroy
       else
         config_list_session_storage['config_list'] = nil
         config_list_session_storage['config_list_sorting'] = nil
@@ -80,7 +84,7 @@ module ActiveScaffold::Actions
 
     def save_config_list_params(config_list, config_list_sorting)
       if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name)
+        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name)
         record.config_list = config_list.join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
         record.save
@@ -111,7 +115,7 @@ module ActiveScaffold::Actions
       return @config_list_record if defined? @config_list_record
       @config_list_record =
         if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, controller_name)
+          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name)
         end
     end
 

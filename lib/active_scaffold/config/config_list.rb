@@ -58,6 +58,10 @@ module ActiveScaffold::Config
 
     UserSettings.class_eval do
       user_attr :default_columns, :save_to_user, :draggable
+
+      def label
+        @conf.label(core: core)
+      end
     end
   end
 end

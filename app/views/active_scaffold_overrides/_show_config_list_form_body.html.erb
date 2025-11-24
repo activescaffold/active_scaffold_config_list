@@ -1,31 +1,39 @@
-<ol class="form">
+<%= as_element :fields_container, class: 'form' do %>
   <% if config_list_columns? %>
-  <li class="form-element">
-    <dl><dt><label><%= as_ :columns %></label></dt>
-    <dd><ul class="<%= active_scaffold_config.config_list.draggable ? 'draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(action: :config_list) %>-columns">
-<% config_list_columns.each do |label, column| %>
-      <li class="sortable">
-        <%= check_box_tag 'config_list[]', column.to_s, (config_list_params.nil? ? true : config_list_params.include?(column)), {id: nil}%>
-        <label><%= label %></label>
-      </li>
-<% end %>
-    </ul></dd></dl>
-  </li>
+    <%= as_element :form_element, class: 'form-element' do %>
+      <%
+        content = active_scaffold_checkbox_list(
+          nil,
+          config_list_columns,
+          config_list_params || config_list_columns.map(&:last),
+          {
+            name: 'config_list[]',
+            id: "#{element_form_id(action: :config_list)}-columns",
+            class: ('sortable-container' unless active_scaffold_config.config_list.draggable)
+          },
+          ui_options: {draggable_lists: active_scaffold_config.config_list.draggable, item_options: {class: 'sortable'}}
+        )
+      %>
+      <%= form_attribute_html(nil, as_(:columns), content, nil, {}) %>
+    <% end %>
   <% end %>
+
   <% if config_list_sorting? %>
-  <li class="form-element">
-    <dl><dt><label><%= as_ :default_sorting %></label></dt>
-    <dd><ol>
-<%
-  columns_options = list_columns.select(&:sortable?).map { |c| [c.label, c.name] }
-  order_options = ['asc', 'desc'].map { |v| [as_(v), v] }
-  selected = config_list_sorting || []
-  3.times do |i|
-%>
-      <li><%= select_tag "config_list_sorting[#{i}][]", options_for_select(columns_options, selected: selected[i]&.first), include_blank: as_(:_select_), class: 'column' %>
-      <%= select_tag "config_list_sorting[#{i}][]", options_for_select(order_options, selected: selected[i]&.last), include_blank: as_(:_select_), class: 'order' %></li>
-<% end %>
-    </ol></dd></dl>
-  </li>
+    <%= as_element :form_element, class: 'form-element' do %>
+      <% content = capture do %>
+        <ol>
+          <%
+            columns_options = list_columns.select(&:sortable?).map { |c| [c.label, c.name] }
+            order_options = ['asc', 'desc'].map { |v| [as_(v), v] }
+            selected = config_list_sorting || []
+            3.times do |i|
+          %>
+            <li><%= select_tag "config_list_sorting[#{i}][]", options_for_select(columns_options, selected: selected[i]&.first), include_blank: as_(:_select_), class: 'column' %>
+              <%= select_tag "config_list_sorting[#{i}][]", options_for_select(order_options, selected: selected[i]&.last), include_blank: as_(:_select_), class: 'order' %></li>
+          <% end %>
+        </ol>
+      <% end %>
+      <%= form_attribute_html(nil, as_(:default_sorting), content, nil, {}) %>
+    <% end %>
   <% end %>
-</ol>
+<% end %>

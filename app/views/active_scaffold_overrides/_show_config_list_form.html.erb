@@ -1,6 +1,7 @@
+<% url_options = params_for(action: :index, escape: false, config_list: nil) %>
 <%= render partial: 'base_form', locals: {form_action: :config_list,
                                           method: :get,
-                                          url_options: params_for(action: :index, escape: false, config_list: nil),
+                                          url_options: url_options,
                                           body_partial: 'show_config_list_form_body',
                                           multipart: false,
                                           persistent: false,

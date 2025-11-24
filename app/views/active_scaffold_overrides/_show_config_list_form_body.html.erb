@@ -7,7 +7,7 @@
           config_list_columns,
           config_list_params || config_list_columns.map(&:last),
           {
-            name: 'config_list[]',
+            name: 'config_list',
             id: "#{element_form_id(action: :config_list)}-columns",
             class: ('sortable-container' unless active_scaffold_config.config_list.draggable)
           },

@@ -3,15 +3,18 @@
   <li class="form-element">
     <dl><dt><label><%= as_ :columns %></label></dt>
     <dd>
-      <%= active_scaffold_check_all_buttons(nil, {}, ui_options: {}) if respond_to? :active_scaffold_check_all_buttons %>
-      <ul class="<%= active_scaffold_config.config_list.draggable ? 'checkbox-list draggable-lists' : 'sortable-container' %>" id="<%= element_form_id(action: :config_list) %>-columns">
-<% config_list_columns.each do |label, column| %>
-      <li class="sortable">
-        <%= check_box_tag 'config_list[]', column.to_s, (config_list_params.nil? ? true : config_list_params.include?(column)), {id: nil}%>
-        <label><%= label %></label>
-      </li>
-<% end %>
-    </ul></dd></dl>
+      <%= active_scaffold_checkbox_list(
+            nil,
+            config_list_columns,
+            config_list_params || config_list_columns.map(&:last),
+            {
+              name: 'config_list',
+              id: "#{element_form_id(action: :config_list)}-columns",
+              class: ('sortable-container' unless active_scaffold_config.config_list.draggable)
+            },
+            ui_options: {draggable_lists: active_scaffold_config.config_list.draggable, item_options: {class: 'sortable'}}
+          ) %>
+    </dd></dl>
   </li>
   <% end %>
   <% if config_list_sorting? %>

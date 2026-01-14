@@ -3,7 +3,7 @@ module ActiveScaffold::Actions
     
     def self.included(base)
       base.before_action :store_config_list_params, :set_default_sorting, only: [:index]
-      base.helper_method :config_list_params, :config_list_sorting
+      base.helper_method :config_list_params, :config_list_sorting, :config_list_named_views
     end
 
     def show_config_list
@@ -84,6 +84,7 @@ module ActiveScaffold::Actions
 
     def save_config_list_params(config_list, config_list_sorting, view_name, old_view_name)
       record = config_list_record(old_view_name || view_name)
+      record = config_list_record(view_name, reload: true) if old_view_name.present? && record&.new_record?
       if record
         record.view_name = view_name
         record.config_list = config_list.join(',')
@@ -112,14 +113,24 @@ module ActiveScaffold::Actions
       end
     end
 
-    def config_list_record(view_name = nil)
-      return @config_list_record if defined? @config_list_record
+    def config_list_record(view_name = nil, reload: false)
+      return @config_list_record if !reload && defined?(@config_list_record)
+      view_name ||= params[:config_list_view]
       @config_list_record =
         if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
           args = [config_list_session_storage_key, config_list_controller_name]
           args << view_name if view_name.present?
           active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, *args)
         end
+    end
+
+    def config_list_named_views
+      @config_list_named_views ||=
+        active_scaffold_current_user.send(
+          active_scaffold_config.config_list.named_views_method,
+          config_list_session_storage_key,
+          config_list_controller_name
+        ).compact
     end
 
     def config_list_params

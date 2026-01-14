@@ -5,8 +5,10 @@ module ActiveScaffold::Config
       super
       @link = self.class.link.clone unless self.class.link.nil?
       @save_to_user = self.class.save_to_user
-      @save_named_views = self.class.save_named_views
+      @named_views_method = self.class.named_views_method
       @draggable = self.class.draggable
+      @named_views_position = self.class.named_views_position
+      @named_views_selector = self.class.named_views_selector
     end
 
     # global level configuration
@@ -27,8 +29,18 @@ module ActiveScaffold::Config
     # configures the method in user model to save list configuration for every controller
     cattr_accessor :save_to_user
 
-    # enables saving the views, requires to set a method in save_to_user
-    cattr_accessor :save_named_views
+    # configures the method in user model to return the named views saved for the user,
+    # setting it enables saving the views, but requires to set a method in save_to_user
+    cattr_accessor :named_views_method
+
+    # the position to place the named views selector, :left (next to the title),
+    # :right or :center (default, before the actions and filters)
+    cattr_accessor :named_views_position
+    @@named_views_position = :center
+
+    # the type of selector for named views, :select or :radio
+    cattr_accessor :named_views_selector
+    @@named_views_selector = :select
 
     # enable draggable lists to select displayed columns (enabled by default)
     cattr_accessor :draggable
@@ -48,8 +60,19 @@ module ActiveScaffold::Config
     # configures the method in user model to save list configuration for every controller
     attr_accessor :save_to_user
 
-    # enables saving the views, requires to set a method in save_to_user
-    attr_accessor :save_named_views
+    # configures the method in user model to return the named views saved for the user,
+    # setting it enables saving the views, but requires to set a method in save_to_user
+    attr_accessor :named_views_method
+
+    # the position to place the named views selector, :left (next to the title),
+    # :right or :center (default, before the actions and filters)
+    attr_accessor :named_views_position
+
+    # the type of selector for named views, :select or :radio
+    attr_accessor :named_views_selector
+
+    # generic named views
+    attr_accessor :named_views
 
     # enable draggable lists to select displayed columns
     attr_accessor :draggable
@@ -64,7 +87,8 @@ module ActiveScaffold::Config
     attr_accessor :link
 
     UserSettings.class_eval do
-      user_attr :default_columns, :save_to_user, :draggable, :save_named_views
+      user_attr :default_columns, :save_to_user, :named_views_method, :draggable,
+                :named_views_position, :named_views_selector
 
       def label
         @conf.label(core: core)

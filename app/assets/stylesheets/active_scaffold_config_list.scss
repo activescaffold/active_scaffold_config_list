@@ -1,0 +1,25 @@
+.active-scaffold-header {
+  display: flex;
+  justify-content: space-between;
+
+  > .actions {
+    order: 1;
+  }
+
+  > h2 {
+    flex-grow: 1;
+    &:has(~ .config-list-views.left) {
+      flex-grow: 0;
+    }
+  }
+
+  > .config-list-views {
+    &.left {
+      flex-grow: 1;
+      margin-left: 1em;
+    }
+    &.right {
+      order: 2
+    }
+  }
+}

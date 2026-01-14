@@ -38,7 +38,13 @@
     <li class="form-element">
       <dl><dt><label><%= as_ :view_name %></label></dt>
         <dd>
-          <%= text_field_tag "config_list_view_name", nil, active_scaffold_input_text_options %>
+          <%= text_field_tag "config_list_view_name", params[:config_list_view], active_scaffold_input_text_options %>
+          <% if params[:config_list_view].present? %>
+          <label style="display: none;">
+            <input type="checkbox" name="config_list_old_view_name" value="<%= params[:config_list_view] %>" />
+            Rename the view "<%= params[:config_list_view] %>"
+          </label>
+          <% end %>
         </dd></dl>
     </li>
   <% end %>

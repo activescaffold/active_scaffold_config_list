@@ -15,3 +15,5 @@ module ActiveScaffold
   end
 end
 ActiveSupport.run_load_hooks(:active_scaffold_config_list)
+ActiveScaffold.stylesheets << 'active_scaffold_config_list'
+ActiveScaffold.javascripts << 'active_scaffold_config_list'

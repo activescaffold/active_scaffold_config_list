@@ -6,3 +6,4 @@ en:
     columns: Columns
     default_sorting: Default Sorting
     desc: desc
+    view_name: View Name

@@ -9,6 +9,10 @@ module ActiveScaffold
         true
       end
 
+      def config_list_save_named_views?
+        active_scaffold_config.config_list.save_named_views
+      end
+
       def config_list_columns
         columns =
           if config_list_params.is_a?(Array)

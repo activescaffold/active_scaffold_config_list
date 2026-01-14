@@ -32,7 +32,7 @@ module ActiveScaffold::Actions
         when String
           delete_config_list_params
         when Array
-          save_config_list_params(config_list, config_list_sorting_params)
+          save_config_list_params(config_list, config_list_sorting_params, params.delete(:config_list_view_name).presence, params.delete(:config_list_old_view_name))
         end
       end
     end
@@ -82,9 +82,10 @@ module ActiveScaffold::Actions
       @config_list_sorting = nil
     end
 
-    def save_config_list_params(config_list, config_list_sorting)
-      if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        record = active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name)
+    def save_config_list_params(config_list, config_list_sorting, view_name, old_view_name)
+      record = config_list_record(old_view_name || view_name)
+      if record
+        record.view_name = view_name
         record.config_list = config_list.join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
         record.save
@@ -111,11 +112,13 @@ module ActiveScaffold::Actions
       end
     end
 
-    def config_list_record
+    def config_list_record(view_name = nil)
       return @config_list_record if defined? @config_list_record
       @config_list_record =
         if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name)
+          args = [config_list_session_storage_key, config_list_controller_name]
+          args << view_name if view_name.present?
+          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, *args)
         end
     end
 

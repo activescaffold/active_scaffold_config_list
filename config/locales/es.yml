@@ -6,3 +6,4 @@ es:
     columns: Columnas
     default_sorting: Orden por defecto
     desc: desc
+    view_name: Nombre de vista

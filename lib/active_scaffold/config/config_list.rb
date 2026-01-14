@@ -5,6 +5,7 @@ module ActiveScaffold::Config
       super
       @link = self.class.link.clone unless self.class.link.nil?
       @save_to_user = self.class.save_to_user
+      @save_named_views = self.class.save_named_views
       @draggable = self.class.draggable
     end
 
@@ -26,6 +27,9 @@ module ActiveScaffold::Config
     # configures the method in user model to save list configuration for every controller
     cattr_accessor :save_to_user
 
+    # enables saving the views, requires to set a method in save_to_user
+    cattr_accessor :save_named_views
+
     # enable draggable lists to select displayed columns (enabled by default)
     cattr_accessor :draggable
     self.draggable = true
@@ -44,6 +48,9 @@ module ActiveScaffold::Config
     # configures the method in user model to save list configuration for every controller
     attr_accessor :save_to_user
 
+    # enables saving the views, requires to set a method in save_to_user
+    attr_accessor :save_named_views
+
     # enable draggable lists to select displayed columns
     attr_accessor :draggable
 
@@ -57,7 +64,7 @@ module ActiveScaffold::Config
     attr_accessor :link
 
     UserSettings.class_eval do
-      user_attr :default_columns, :save_to_user, :draggable
+      user_attr :default_columns, :save_to_user, :draggable, :save_named_views
 
       def label
         @conf.label(core: core)

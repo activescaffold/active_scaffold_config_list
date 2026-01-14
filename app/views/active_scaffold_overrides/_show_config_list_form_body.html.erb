@@ -33,4 +33,13 @@
     </ol></dd></dl>
   </li>
   <% end %>
+
+  <% if config_list_save_named_views? %>
+    <li class="form-element">
+      <dl><dt><label><%= as_ :view_name %></label></dt>
+        <dd>
+          <%= text_field_tag "config_list_view_name", nil, active_scaffold_input_text_options %>
+        </dd></dl>
+    </li>
+  <% end %>
 </ol>

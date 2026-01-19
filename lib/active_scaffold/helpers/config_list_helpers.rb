@@ -39,14 +39,22 @@ module ActiveScaffold
         return unless named_views.any?
 
         named_views.unshift ['Default', '']
+        html = config_list_view_options(named_views, params[:config_list_view].to_s)
+        if active_scaffold_config.config_list.named_views_selector == :select
+          html = select_tag('config_list_view', html, id: nil)
+        end
+        html
+      end
+
+      def config_list_view_options(named_views, selected)
         case active_scaffold_config.config_list.named_views_selector
         when :select
-          select_tag('config_list_view', options_for_select(named_views, params[:config_list_view]))
+          options_for_select(named_views, selected)
         when :radio
           buttons = named_views.map do |(label, name)|
             name ||= label
             content_tag(:label) do
-              radio_button_tag('config_list_view', name, name == params[:config_list_view]) + label
+              radio_button_tag('config_list_view', name, name == selected, id: nil) + label
             end
           end
           safe_join(buttons)

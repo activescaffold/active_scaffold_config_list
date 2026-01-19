@@ -2,22 +2,53 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_action :store_config_list_params, :set_default_sorting, only: [:index]
+      base.before_action :set_default_sorting, :change_view, only: [:index]
+      base.before_action :config_list_authorized_filter, only: [:show_config_list, :config_list]
       base.helper_method :config_list_params, :config_list_sorting, :config_list_named_views
     end
 
     def show_config_list
-      respond_to do |type|
-        type.html do
-          render(action: 'show_config_list_form', layout: true)
-        end
-        type.js do
-          render(partial: 'show_config_list_form', layout: false)
-        end
-      end
+      respond_to_action(:show_config_list, config_list_formats)
+    end
+
+    def config_list
+      do_config_list
+      respond_to_action(:config_list, config_list_formats)
     end
     
     protected
+
+    def change_view
+      active_scaffold_config.list.refresh_with_header = true if params[:config_list_view]
+    end
+
+    def config_list_formats
+      [:html, :js]
+    end
+
+    def show_config_list_respond_to_html
+      render(action: 'show_config_list_form', layout: true)
+    end
+
+    def show_config_list_respond_to_js
+      render(partial: 'show_config_list_form', layout: false)
+    end
+
+    def config_list_respond_to_html
+      redirect_to action: :index, config_list_view: params[:config_list_view_name]
+    end
+
+    def do_refresh_list
+      set_default_sorting
+      super
+    end
+
+    def config_list_respond_to_js
+      do_refresh_list
+      active_scaffold_config.list.refresh_with_header = true
+      list_url = params_for(action: :index, config_list_view: @delete_config_list_view ? nil : params[:config_list_view_name])
+      render partial: 'refresh_list', locals: {history_url: url_for(list_url)}, formats: [:js]
+    end
     
     def set_default_sorting
       if (params['sort_direction'] && params['sort_direction'] == 'reset') || (active_scaffold_config.list.user['sort'].blank? && params['sort'].blank?)
@@ -25,15 +56,13 @@ module ActiveScaffold::Actions
       end
     end
 
-    def store_config_list_params
-      if params[:config_list]
-        config_list = params.delete :config_list
-        case config_list
-        when String
-          delete_config_list_params
-        when Array
-          save_config_list_params(config_list, config_list_sorting_params, params.delete(:config_list_view_name).presence, params.delete(:config_list_old_view_name))
-        end
+    def do_config_list
+      config_list = params.delete :config_list
+      case config_list
+      when String
+        delete_config_list_params(params.delete(:config_list_view_name).presence)
+      when Array
+        save_config_list_params(config_list, config_list_sorting_params, params.delete(:config_list_view_name).presence, params.delete(:config_list_old_view_name))
       end
     end
     
@@ -70,9 +99,15 @@ module ActiveScaffold::Actions
       @active_scaffold_current_user ||= send(self.class.active_scaffold_config.class.security.current_user_method)
     end
 
-    def delete_config_list_params
-      if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-        active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, config_list_session_storage_key, config_list_controller_name).destroy
+    def delete_config_list_params(view_name)
+      record = config_list_record(view_name)
+      if record
+        @delete_config_list_view = record.destroy
+        if @delete_config_list_view && params[:config_list_view].present?
+          params[:config_list_view] = ''
+          config_list_record(reload: true)
+          return
+        end
       else
         config_list_session_storage['config_list'] = nil
         config_list_session_storage['config_list_sorting'] = nil
@@ -86,10 +121,11 @@ module ActiveScaffold::Actions
       record = config_list_record(old_view_name || view_name)
       record = config_list_record(view_name, reload: true) if old_view_name.present? && record&.new_record?
       if record
-        record.view_name = view_name
-        record.config_list = config_list.join(',')
+        record.view_name = view_name if view_name
+        record.config_list = config_list.select(&:present?).join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
-        record.save
+        @rename_config_list_view = record.persisted? && record.view_name_changed?
+        params[:config_list_view] = view_name if record.save
       else
         config_list_session_storage['config_list'] = config_list.map(&:to_sym)
         config_list_session_storage['config_list_sorting'] = config_list_sorting
@@ -179,6 +215,10 @@ module ActiveScaffold::Actions
     # You may override the method to customize.
     def config_list_authorized?
       authorized_for?(action: :read)
+    end
+
+    def config_list_authorized_filter
+      raise ActiveScaffold::ActionNotAllowed unless config_list_authorized?
     end
   end
 end

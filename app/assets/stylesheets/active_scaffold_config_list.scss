@@ -21,5 +21,11 @@
     &.right {
       order: 2
     }
+    display: flex;
+    gap: 10px;
+
+    input[type=radio] {
+      margin-right: 5px;
+    }
   }
 }

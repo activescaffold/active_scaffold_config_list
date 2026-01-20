@@ -27,5 +27,40 @@
     input[type=radio] {
       margin-right: 5px;
     }
+
+    &:has(.views) {
+      position: relative;
+      > .selected-view, a {
+        display: block;
+        padding: 8px 12px;
+        white-space: nowrap;
+        text-decoration: none;
+        color: #333;
+      }
+      .selected a {
+        color: #06c;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      > .views {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #ccc;
+        display: none;
+        background: white;
+      }
+      &:hover {
+        > .views {
+          display: block;
+          position: absolute;
+          top: 0;
+          left: 0;
+          z-index: 1;
+        }
+      }
+    }
   }
 }

@@ -48,8 +48,20 @@ module ActiveScaffold
 
       def config_list_view_options(named_views, selected)
         case active_scaffold_config.config_list.named_views_selector
+        when :links
+          url = url_for(params_for(action: :index, config_list_view: '--VIEW--'))
+          view = nil
+          links = named_views.map do |(label, name)|
+            name ||= label
+            link = link_to(label, url.sub('--VIEW--', ERB::Util.unwrapped_html_escape(name)), remote: true)
+            view = label if name == selected
+            content_tag :li, link, class: ('selected' if name == selected)
+          end
+          content_tag(:div, view, class: 'selected-view') + content_tag(:ul, safe_join(links), class: 'views')
+
         when :select
           options_for_select(named_views, selected)
+
         when :radio
           buttons = named_views.map do |(label, name)|
             name ||= label

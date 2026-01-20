@@ -38,9 +38,9 @@ module ActiveScaffold::Config
     cattr_accessor :named_views_position
     @@named_views_position = :center
 
-    # the type of selector for named views, :select or :radio
+    # the type of selector for named views, :links, :select or :radio
     cattr_accessor :named_views_selector
-    @@named_views_selector = :select
+    @@named_views_selector = :links
 
     # enable draggable lists to select displayed columns (enabled by default)
     cattr_accessor :draggable
@@ -68,7 +68,7 @@ module ActiveScaffold::Config
     # :right or :center (default, before the actions and filters)
     attr_accessor :named_views_position
 
-    # the type of selector for named views, :select or :radio
+    # the type of selector for named views, :links, :select or :radio
     attr_accessor :named_views_selector
 
     # generic named views

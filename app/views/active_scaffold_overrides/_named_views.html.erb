@@ -1,0 +1,14 @@
+<%
+  attributes = {class: "config-list-views #{active_scaffold_config.config_list.named_views_position}"}
+  if active_scaffold_config.config_list.named_views_selector == :links
+    method = :content_tag
+    arg = :div
+  else
+    method = :form_tag
+    arg = params_for(action: :index, config_list_view: nil)
+    attributes.merge! remote: true, method: :get
+  end
+%>
+<%= send(method, arg, attributes) do %>
+  <%= active_scaffold_named_view_selector %>
+<% end %>

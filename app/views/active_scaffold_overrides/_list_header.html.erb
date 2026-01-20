@@ -1,7 +1,2 @@
 <%= render :super %>
-<% if config_list_named_views? %>
-  <%= form_tag(params_for(action: :index, config_list_view: nil), remote: true, method: :get,
-               class: "config-list-views #{active_scaffold_config.config_list.named_views_position}") do %>
-    <%= active_scaffold_named_view_selector %>
-  <% end %>
-<% end %>
+<%= render 'named_views' if config_list_named_views? %>

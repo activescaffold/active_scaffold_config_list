@@ -38,7 +38,7 @@ module ActiveScaffold
         named_views = user_named_views
         return unless named_views.any?
 
-        named_views.unshift ['Default', '']
+        named_views.unshift [as_(:default_view), '']
         html = config_list_view_options(named_views, params[:config_list_view].to_s)
         if active_scaffold_config.config_list.named_views_selector == :select
           html = select_tag('config_list_view', html, id: nil)

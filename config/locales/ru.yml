@@ -5,5 +5,6 @@ ru:
     config_list_model: "%{model}: настройки списка"
     columns: Columns
     default_sorting: Default Sorting
+    default_view: Default
     desc: desc
     view_name: View Name

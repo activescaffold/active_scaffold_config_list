@@ -46,7 +46,7 @@ module ActiveScaffold::Actions
     def config_list_respond_to_js
       do_refresh_list
       active_scaffold_config.list.refresh_with_header = true
-      list_url = params_for(action: :index, config_list_view: @delete_config_list_view ? nil : params[:config_list_view_name])
+      list_url = params_for(action: :index, config_list_view: @delete_config_list_view ? nil : params[:config_list_view].presence)
       render partial: 'refresh_list', locals: {history_url: url_for(list_url)}, formats: [:js]
     end
     

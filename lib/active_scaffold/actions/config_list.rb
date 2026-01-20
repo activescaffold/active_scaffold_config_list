@@ -124,7 +124,6 @@ module ActiveScaffold::Actions
         record.view_name = view_name if view_name
         record.config_list = config_list.select(&:present?).join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
-        @rename_config_list_view = record.persisted? && record.view_name_changed?
         params[:config_list_view] = view_name if record.save
       else
         config_list_session_storage['config_list'] = config_list.map(&:to_sym)

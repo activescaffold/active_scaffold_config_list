@@ -198,7 +198,7 @@ module ActiveScaffold::Actions
     end
 
     def list_columns
-      @list_columns ||= begin
+      @list_columns ||= named_view_columns || begin
         columns = super
         if config_list_params.present?
           config_list = config_list_params.each.with_index.to_h
@@ -213,7 +213,20 @@ module ActiveScaffold::Actions
     # The default security delegates to ActiveRecordPermissions.
     # You may override the method to customize.
     def config_list_authorized?
-      authorized_for?(action: :read)
+      named_view.nil? && authorized_for?(action: :read)
+    end
+
+    def named_view
+      return unless params[:config_list_view].present?
+
+      @named_view ||= active_scaffold_config.config_list.named_views.find { |v| v.name == params[:config_list_view] }
+    end
+
+    def named_view_columns
+      return unless named_view
+
+      raise ActiveScaffold::ActionNotAllowed if named_view.security_method && !send(named_view.security_method)
+      named_view.columns.visible_columns(flatten: true)
     end
 
     def config_list_authorized_filter

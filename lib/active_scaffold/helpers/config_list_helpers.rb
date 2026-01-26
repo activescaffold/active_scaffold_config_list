@@ -34,8 +34,15 @@ module ActiveScaffold
         config_list_named_views
       end
 
+      def named_views_from_config
+        active_scaffold_config.config_list.named_views.filter_map do |view|
+          next if view.security_method && !controller.send(view.security_method)
+          [view.label, view.name]
+        end
+      end
+
       def active_scaffold_named_view_selector
-        named_views = user_named_views
+        named_views = user_named_views + named_views_from_config
         return unless named_views.any?
 
         named_views.unshift [as_(:default_view), '']

@@ -9,6 +9,7 @@ module ActiveScaffold::Config
       @draggable = self.class.draggable
       @named_views_position = self.class.named_views_position
       @named_views_selector = self.class.named_views_selector
+      @named_views = []
     end
 
     # global level configuration
@@ -72,7 +73,7 @@ module ActiveScaffold::Config
     attr_accessor :named_views_selector
 
     # generic named views
-    attr_accessor :named_views
+    attr_reader :named_views
 
     # enable draggable lists to select displayed columns
     attr_accessor :draggable
@@ -82,9 +83,20 @@ module ActiveScaffold::Config
       columns.exclude :created_on, :created_at, :updated_on, :updated_at, :as_marked
       columns.exclude *@core.columns.select{|c| c.association.try(:polymorphic?)}.map(&:name)
     end
-    
+
     # the ActionLink for this action
     attr_accessor :link
+
+    def add_view(name, columns = nil, &)
+      raise ArgumentError, "view '#{name}' already exists" if @named_views.find { |v| v.name == name }
+      view = ::ActiveScaffold::DataStructures::NamedView.new(name, self)
+      view.columns = columns if columns
+      yield view if block_given?
+      raise ArgumentError, "no columns defined for view '#{name}'" if view.columns.empty?
+
+      @named_views << view
+      view
+    end
 
     UserSettings.class_eval do
       user_attr :default_columns, :save_to_user, :named_views_method, :draggable,

@@ -15,7 +15,14 @@ module ActiveScaffold
 
       def config_list_named_views?
         return unless active_scaffold_config.actions.include? :config_list
+
         config_list_save_named_views? || active_scaffold_config.config_list.named_views.present?
+      end
+
+      def config_list_global_views?
+        return unless active_scaffold_config.actions.include? :config_list
+
+        config_list_save_named_views? && active_scaffold_config.config_list.global_views
       end
 
       def config_list_columns

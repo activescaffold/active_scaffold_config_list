@@ -38,12 +38,18 @@
     <li class="form-element">
       <dl><dt><label><%= as_ :view_name %></label></dt>
         <dd>
-          <%= text_field_tag "config_list_view_name", params[:config_list_view], active_scaffold_input_text_options.merge(required: params[:config_list_view].present?) %>
-          <% if params[:config_list_view].present? %>
-          <label style="display: none;">
-            <input type="checkbox" name="config_list_old_view_name" value="<%= params[:config_list_view] %>" />
-            Rename the view "<%= params[:config_list_view] %>"
-          </label>
+          <%= text_field_tag "config_list_view_name", @config_list_view_name, active_scaffold_input_text_options.merge(required: @config_list_view_name.present?) %>
+          <% if @config_list_view_name.present? %>
+            <label class="rename-view" style="display: none;">
+              <input type="checkbox" name="config_list_old_view_name" value="<%= params[:config_list_view] %>" />
+              <%= as_ :rename_view, view_name: @config_list_view_name %>
+            </label>
+          <% end %>
+          <% if config_list_global_views? %>
+            <%= content_tag :label, class: 'global-view', style: ('display: none;' if @config_list_view_name.blank?) do %>
+              <%= check_box_tag 'global_view', '1', @global_view, id: nil %>
+              <%= as_ :global_view %>
+            <% end %>
           <% end %>
         </dd></dl>
     </li>

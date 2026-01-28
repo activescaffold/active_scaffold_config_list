@@ -7,4 +7,6 @@ es:
     default_sorting: Orden por defecto
     default_view: Por defecto
     desc: desc
+    global_view: Vista global
+    rename_view: 'Renombrar la vista "%{view_name}"'
     view_name: Nombre de vista

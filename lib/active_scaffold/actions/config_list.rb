@@ -8,6 +8,7 @@ module ActiveScaffold::Actions
     end
 
     def show_config_list
+      config_list_record
       respond_to_action(:show_config_list, config_list_formats)
     end
 
@@ -46,7 +47,7 @@ module ActiveScaffold::Actions
     def config_list_respond_to_js
       do_refresh_list
       active_scaffold_config.list.refresh_with_header = true
-      list_url = params_for(action: :index, config_list_view: @delete_config_list_view ? nil : params[:config_list_view].presence)
+      list_url = params_for(action: :index, config_list_view: params[:config_list_view].presence)
       render partial: 'refresh_list', locals: {history_url: url_for(list_url)}, formats: [:js]
     end
     
@@ -60,7 +61,7 @@ module ActiveScaffold::Actions
       config_list = params.delete :config_list
       case config_list
       when String
-        delete_config_list_params(params.delete(:config_list_view_name).presence)
+        delete_config_list_params(params.delete(:config_list_view).presence)
       when Array
         save_config_list_params(config_list, config_list_sorting_params, params.delete(:config_list_view_name).presence, params.delete(:config_list_old_view_name))
       end
@@ -102,9 +103,7 @@ module ActiveScaffold::Actions
     def delete_config_list_params(view_name)
       record = config_list_record(view_name)
       if record
-        @delete_config_list_view = record.destroy
-        if @delete_config_list_view && params[:config_list_view].present?
-          params[:config_list_view] = ''
+        if record.destroy && view_name.present?
           config_list_record(reload: true)
           return
         end
@@ -118,13 +117,14 @@ module ActiveScaffold::Actions
     end
 
     def save_config_list_params(config_list, config_list_sorting, view_name, old_view_name)
-      record = config_list_record(old_view_name || view_name)
-      record = config_list_record(view_name, reload: true) if old_view_name.present? && record&.new_record?
+      assign = {view_name: view_name}
+      assign[:slug] = config_list_slug(view_name) if active_scaffold_config.config_list.global_views
+      record = config_list_record(config_list_slug(old_view_name || view_name), assign: assign)
+
       if record
-        record.view_name = view_name if view_name
         record.config_list = config_list.select(&:present?).join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
-        params[:config_list_view] = view_name if record.save
+        params[:config_list_view] = assign[:slug] || view_name if record.save
       else
         config_list_session_storage['config_list'] = config_list.map(&:to_sym)
         config_list_session_storage['config_list_sorting'] = config_list_sorting
@@ -148,15 +148,45 @@ module ActiveScaffold::Actions
       end
     end
 
-    def config_list_record(view_name = nil, reload: false)
+    def config_list_record(view_name = params[:config_list_view], reload: false, assign: nil)
       return @config_list_record if !reload && defined?(@config_list_record)
-      view_name ||= params[:config_list_view]
       @config_list_record =
         if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
-          args = [config_list_session_storage_key, config_list_controller_name]
-          args << view_name if view_name.present?
-          active_scaffold_current_user.send(active_scaffold_config.config_list.save_to_user, *args)
+          if view_name.present?
+            global_views = active_scaffold_config.config_list.global_views
+            options = {attributes: assign}
+            options[active_scaffold_config.config_list.global_views ? :slug : :view_name] = view_name
+          end
+          active_scaffold_current_user.send(
+            active_scaffold_config.config_list.save_to_user,
+            config_list_session_storage_key,
+            config_list_controller_name,
+            **options
+          ).tap do |_, saved_view_name|
+            @config_list_view_name = saved_view_name.presence ||
+                                     global_views ? find_view_name(view_name) : view_name.presence
+          end
         end
+    end
+
+    def find_view_name(slug)
+      return unless slug.present?
+
+      config_list_named_views.find do |view_name, view_slug|
+        break view_name if slug == view_slug
+      end
+    end
+
+    def config_list_slug(view_name)
+      return view_name unless active_scaffold_config.config_list.global_views
+
+      if Config::ConfigList.slug_builder
+        send(Config::ConfigList.slug_builder, view_name)
+      elsif params[:global_view]
+        "global-#{view_name}"
+      else
+        "user-#{view_name}"
+      end
     end
 
     def config_list_named_views

@@ -9,8 +9,12 @@ jQuery(document).ready(function () {
         link.attr('href', href.toString());
     })
     jQuery(document).on('input', '.show_config_list-view [name="config_list_view_name"]', function () {
-        var field = jQuery(this), rename = field.next();
+        var field = jQuery(this),
+          rename = field.parent().find('.rename-view'),
+          global = field.parent().find('.global-view');
         if (field.val() !== field.attr('value')) rename.show();
         else rename.hide();
+        if (field.val().trim()) global.show();
+        else global.hide();
     })
 });

@@ -7,4 +7,6 @@ ja:
     default_sorting: Default Sorting
     default_view: Default
     desc: desc
+    global_view: Global view
+    rename_view: 'Rename the view "%{view_name}"'
     view_name: View Name

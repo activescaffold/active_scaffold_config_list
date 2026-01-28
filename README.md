@@ -190,7 +190,7 @@ The method configured in `save_to_user` must look for user views when the slug s
 ```rb
 def config_list_for(controller_id, controller_name, slug: nil, attributes: nil)
   query = list_configurations
-  query = list_configurations.or(UserListConfiguration.where(user_id: nil)) unless slug.to_s.start_with?('user-')
+  query = UserListConfiguration.where(user_id: nil).or(list_configurations) unless slug.to_s.start_with?('user-')
   query.where(controller_id: controller_name, slug: slug).first_or_initialize.tap do |record|
     record.attributes = attributes if attributes
   end
@@ -217,4 +217,6 @@ def config_list_views(controller_id, controller_name)
 end
 ```
 
-If you want to change how slugs are built globally, you can define a method in ApplicationController, and configure it with `conf.config_list.slug_builder` in `ActiveScaffold.defaults`. It's a global setting only, can't be set per controller. To customize slug builder in a controller, define `config_list_slug` in the controller. The `config_list_slug` method, and the slug builder method, will get the view name and must return the slug. It's called when saving a view, and can check `params[:global_view]` to see if the view name is global.
+If you want to change how slugs are built globally, you can define a method in ApplicationController, and configure it with `conf.config_list.slug_builder` in `ActiveScaffold.defaults`. It's a global setting only, can't be set per controller. To customize slug builder in a controller, define `config_list_slug` in the controller. The `config_list_slug` method, and the slug builder method, will get the view name and global_view boolean, and must return the slug. It's called when saving a view.
+
+When editing a view, global checkbox can be changed only if a new view is going to be created (the name of the view is changed, and rename is unchecked). 

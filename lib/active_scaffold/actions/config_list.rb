@@ -9,6 +9,10 @@ module ActiveScaffold::Actions
 
     def show_config_list
       config_list_record
+      @config_list_view_name = find_view_name(params[:config_list_view])
+      if @config_list_view_name.present?
+        @global_view = config_list_slug(@config_list_view_name, true) == params[:config_list_view]
+      end
       respond_to_action(:show_config_list, config_list_formats)
     end
 
@@ -118,8 +122,8 @@ module ActiveScaffold::Actions
 
     def save_config_list_params(config_list, config_list_sorting, view_name, old_view_name)
       assign = {view_name: view_name}
-      assign[:slug] = config_list_slug(view_name) if active_scaffold_config.config_list.global_views
-      record = config_list_record(config_list_slug(old_view_name || view_name), assign: assign)
+      assign[:slug] = config_list_slug(view_name, params.delete(:global_view).present?) if active_scaffold_config.config_list.global_views
+      record = config_list_record(old_view_name || assign[:slug] || view_name, assign: assign)
 
       if record
         record.config_list = config_list.select(&:present?).join(',')
@@ -153,7 +157,6 @@ module ActiveScaffold::Actions
       @config_list_record =
         if active_scaffold_config.config_list.save_to_user && active_scaffold_current_user
           if view_name.present?
-            global_views = active_scaffold_config.config_list.global_views
             options = {attributes: assign}
             options[active_scaffold_config.config_list.global_views ? :slug : :view_name] = view_name
           end
@@ -162,10 +165,7 @@ module ActiveScaffold::Actions
             config_list_session_storage_key,
             config_list_controller_name,
             **options
-          ).tap do |_, saved_view_name|
-            @config_list_view_name = saved_view_name.presence ||
-                                     global_views ? find_view_name(view_name) : view_name.presence
-          end
+          )
         end
     end
 
@@ -173,16 +173,16 @@ module ActiveScaffold::Actions
       return unless slug.present?
 
       config_list_named_views.find do |view_name, view_slug|
-        break view_name if slug == view_slug
+        break view_name if slug == (view_slug || view_name)
       end
     end
 
-    def config_list_slug(view_name)
+    def config_list_slug(view_name, global_view)
       return view_name unless active_scaffold_config.config_list.global_views
 
-      if Config::ConfigList.slug_builder
-        send(Config::ConfigList.slug_builder, view_name)
-      elsif params[:global_view]
+      if ActiveScaffold::Config::ConfigList.slug_builder
+        send(ActiveScaffold::Config::ConfigList.slug_builder, view_name, global_view)
+      elsif global_view
         "global-#{view_name}"
       else
         "user-#{view_name}"

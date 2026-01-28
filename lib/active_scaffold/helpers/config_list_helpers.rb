@@ -71,7 +71,7 @@ module ActiveScaffold
             view = label if name == selected
             content_tag :li, link, class: ('selected' if name == selected)
           end
-          content_tag(:div, view, class: 'selected-view') + content_tag(:ul, safe_join(links), class: 'views')
+          content_tag(:div, view || as_(:default_view), class: 'selected-view') + content_tag(:ul, safe_join(links), class: 'views')
 
         when :select
           options_for_select(named_views, selected)

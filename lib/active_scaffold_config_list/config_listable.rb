@@ -18,13 +18,17 @@ module ActiveScaffoldConfigList
           has_many association_name, class_name: model_name, **association_options
         end
 
+        model_class = model_name.to_s.classify.constantize
+        view_name_column = nil unless model_class.column_names.include?(view_name_column.to_s)
+        slug_column = nil unless model_class.column_names.include?(slug_column.to_s)
+
         self.config_list_settings = {
           association_name: association_name,
           model_name: model_name,
           view_name_column: view_name_column,
           slug_column: slug_column,
           controller_column: controller_column,
-          model_class: model_name.to_s.classify.constantize,
+          model_class: model_class,
           foreign_key: reflect_on_association(association_name).foreign_key,
           controller_matcher: controller_matcher
         }.freeze
@@ -47,6 +51,9 @@ module ActiveScaffoldConfigList
           query = query.where(settings[:slug_column] => slug)
         elsif view_name
           query = query.where(settings[:view_name_column] => view_name)
+        else
+          column = settings[:slug_column] || settings[:view_name_column]
+          query = query.where(column => nil) if column
         end
 
         query.first_or_initialize.tap do |record|

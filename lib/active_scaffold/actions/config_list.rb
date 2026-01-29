@@ -121,14 +121,16 @@ module ActiveScaffold::Actions
     end
 
     def save_config_list_params(config_list, config_list_sorting, view_name, old_view_name)
-      assign = {view_name: view_name}
-      assign[:slug] = config_list_slug(view_name, params.delete(:global_view).present?) if active_scaffold_config.config_list.global_views
-      record = config_list_record(old_view_name || assign[:slug] || view_name, assign: assign)
+      if view_name.present?
+        assign = {view_name: view_name}
+        assign[:slug] = config_list_slug(view_name, params.delete(:global_view).present?) if active_scaffold_config.config_list.global_views
+      end
+      record = config_list_record(old_view_name || assign&.dig(:slug) || view_name, assign: assign)
 
       if record
         record.config_list = config_list.select(&:present?).join(',')
         record.config_list_sorting = config_list_sorting if record.respond_to? :config_list_sorting
-        params[:config_list_view] = assign[:slug] || view_name if record.save
+        params[:config_list_view] = assign&.dig(:slug) || view_name if record.save
       else
         config_list_session_storage['config_list'] = config_list.map(&:to_sym)
         config_list_session_storage['config_list_sorting'] = config_list_sorting

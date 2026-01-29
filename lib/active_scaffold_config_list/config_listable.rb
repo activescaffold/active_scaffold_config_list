@@ -84,7 +84,7 @@ module ActiveScaffoldConfigList
         settings = self.class.config_list_settings
         query = send(settings[:association_name])
         # Add the OR condition if user_views is false
-        query = query.or(settings[:model_class].where(settings[:foreign_key] => nil)) unless user_views
+        query = settings[:model_class].where(settings[:foreign_key] => nil).or(query) unless user_views
         query.where(determine_controller_value(controller_id, controller_name, settings))
       end
 

@@ -220,7 +220,9 @@ module ActiveScaffold::Actions
     def config_list_sorting
       unless defined? @config_list_sorting
         @config_list_sorting =
-          if config_list_record
+          if named_view
+            named_view.sorting
+          elsif config_list_record
             config_list_record.config_list_sorting if config_list_record.respond_to? :config_list_sorting
           else
             config_list_session_storage['config_list_sorting']

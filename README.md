@@ -99,12 +99,13 @@ It's possible to define named views, with a set of columns, so users can switch 
 conf.config_list.add_view :simple, [:number, :status]
 ```
 
-Although it's possible to use a block too, to change other view settings, such as label and security method. If the label is set, it can be a string, or a symbol to be localized, and the name is used in the URL parameters. When using a block, the columns can be defined in the view instead of the `add_view` call:
+Although it's possible to use a block too, to change other view settings, such as label, sorting and security method. If the label is set, it can be a string, or a symbol to be localized, and the name is used in the URL parameters. When using a block, the columns can be defined in the view instead of the `add_view` call:
 
 ```rb
 conf.config_list.add_view :simple do |view|
   view.label = 'Number and Status'
   view.columns = [:number, :status]
+  view.sorting = {number: :desc}
   view.security_method = :simple_view_authorized?
 end
 ```

@@ -14,6 +14,9 @@ module ActiveScaffold::DataStructures
     # the columns in the named view
     attr_reader :columns
 
+    # default sorting used with this view instead of default
+    attr_accessor :sorting
+
     def initialize(name, action)
       @name = name.to_s
       @action = action

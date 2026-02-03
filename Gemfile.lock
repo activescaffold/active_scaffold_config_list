@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    active_scaffold_config_list (3.6.3)
-      active_scaffold (>= 3.7.1)
+    active_scaffold_config_list (4.0.0)
+      active_scaffold (>= 4.2.0)
       active_scaffold_sortable (>= 3.2.2)
 
 GEM

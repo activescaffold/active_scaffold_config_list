@@ -27,7 +27,7 @@ class ConfigListHelpersTest < Minitest::Test
   class Helper < BaseHelper
     include ActiveScaffold::Helpers::ConfigListHelpers
 
-    attr_accessor :default_view_authorized, :default_view_security_method, :selector
+    attr_accessor :selector, :unnamed_view_authorized, :unnamed_view_security_method
     attr_reader :element_calls, :link_calls, :radio_calls, :select_calls
 
     def initialize
@@ -35,13 +35,13 @@ class ConfigListHelpersTest < Minitest::Test
       @link_calls = []
       @radio_calls = []
       @select_calls = []
-      @default_view_authorized = true
+      @unnamed_view_authorized = true
       @selector = :radio
     end
 
     def active_scaffold_config
-      config_list = Struct.new(:named_views_selector, :default_view_security_method)
-      Struct.new(:config_list).new(config_list.new(selector, default_view_security_method))
+      config_list = Struct.new(:named_views_selector, :unnamed_view_security_method)
+      Struct.new(:config_list).new(config_list.new(selector, unnamed_view_security_method))
     end
 
     def as_element(key, content = nil, **options)
@@ -103,8 +103,8 @@ class ConfigListHelpersTest < Minitest::Test
       self
     end
 
-    def default_view_authorized?
-      default_view_authorized
+    def unnamed_view_authorized?
+      unnamed_view_authorized
     end
 
     def as_(key)
@@ -162,10 +162,10 @@ class ConfigListHelpersTest < Minitest::Test
     assert_equal({id: nil}, helper.select_calls.first.last)
   end
 
-  def test_default_view_can_be_hidden_with_security_method
+  def test_unnamed_view_can_be_hidden_with_security_method
     helper = Helper.new
-    helper.default_view_security_method = :default_view_authorized?
-    helper.default_view_authorized = false
+    helper.unnamed_view_security_method = :unnamed_view_authorized?
+    helper.unnamed_view_authorized = false
 
     helper.active_scaffold_named_view_selector
 

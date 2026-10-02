@@ -81,10 +81,18 @@ conf.config_list.named_views_selector = :select # use select field
 conf.config_list.named_views_selector = :links  # use a menu of links (default)
 ```
 
-The default choice is included in the selector unless `default_view_security_method` is configured. The method runs on the controller and must return true to include that choice. This controls selector visibility; applications must still enforce authorization for the underlying list action.
+A named view can be selected by default when the request does not contain `config_list_view`:
 
 ```rb
-conf.config_list.default_view_security_method = :default_list_view_authorized?
+conf.config_list.default_view = 'Calendar'
+```
+
+An explicit empty `config_list_view` still selects the ordinary, unnamed list view. For a request-dependent default, set the parameter in a controller callback before ActiveScaffold processes the index action instead of using this static setting.
+
+The unnamed choice, shown as "Default" in the selector, is included unless `unnamed_view_security_method` is configured. It is the configurable list that uses saved/session columns or `config_list.default_columns`; it is separate from the named view selected by `default_view`. The method runs on the controller and must return true to include the unnamed choice. This controls selector visibility; applications must still enforce authorization for the underlying list action.
+
+```rb
+conf.config_list.unnamed_view_security_method = :unnamed_list_view_authorized?
 ```
 
 The position of the views selector can be changed with `conf.config_list.named_views_position`, setting it to `:center` (default, between the title and actions), `:left` (next to the title) or `:right` (at the right of the actions). Although the position of the `div.config-list-views` doesn't change, it just adds a class (center, right or left) and use CSS of flexbox layout to change the position (changing `flex-grow` and `order`). It can be changed per controller or globally in `ActiveScaffold.defaults`:

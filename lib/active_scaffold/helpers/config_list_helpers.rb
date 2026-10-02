@@ -52,8 +52,8 @@ module ActiveScaffold
         end
       end
 
-      def config_list_default_view?
-        security_method = active_scaffold_config.config_list.default_view_security_method
+      def config_list_unnamed_view?
+        security_method = active_scaffold_config.config_list.unnamed_view_security_method
         security_method.nil? || controller.send(security_method)
       end
 
@@ -61,7 +61,7 @@ module ActiveScaffold
         named_views = user_named_views + named_views_from_config
         return unless named_views.any?
 
-        named_views.unshift [as_(:default_view), ''] if config_list_default_view?
+        named_views.unshift [as_(:default_view), ''] if config_list_unnamed_view?
         html = config_list_view_options(named_views, params[:config_list_view].to_s)
         if active_scaffold_config.config_list.named_views_selector == :select
           select_options = as_element_attributes(:config_list_view_select, id: nil)

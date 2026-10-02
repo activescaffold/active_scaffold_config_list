@@ -2,7 +2,7 @@ module ActiveScaffold::Actions
   module ConfigList
     
     def self.included(base)
-      base.before_action :set_default_sorting, :change_view, only: [:index]
+      base.before_action :set_default_view, :set_default_sorting, :change_view, only: [:index]
       base.before_action :config_list_authorized_filter, only: [:show_config_list, :config_list]
       base.helper_method :config_list_params, :config_list_sorting, :config_list_named_views, :named_view
     end
@@ -22,6 +22,13 @@ module ActiveScaffold::Actions
     end
     
     protected
+
+    def set_default_view
+      return unless params[:config_list_view].nil?
+
+      default_view = active_scaffold_config.config_list.default_view
+      params[:config_list_view] = default_view.to_s if default_view.present?
+    end
 
     def change_view
       active_scaffold_config.list.refresh_with_header = true if params[:config_list_view]

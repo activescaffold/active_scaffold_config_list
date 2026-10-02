@@ -9,6 +9,10 @@ module ActiveScaffold
         true
       end
 
+      def ignore_param_for_nested?(key)
+        super || key == :config_list_view
+      end
+
       def config_list_save_named_views?
         active_scaffold_config.config_list.named_views_method.present?
       end

@@ -251,7 +251,7 @@ module ActiveScaffold::Actions
     end
 
     def named_view
-      return unless params[:config_list_view].present?
+      return @named_view unless params[:config_list_view].present?
 
       @named_view ||= active_scaffold_config.config_list.named_views.find { |v| v.name == params[:config_list_view] }
     end

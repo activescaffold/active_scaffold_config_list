@@ -73,12 +73,18 @@ end
 
 When a named view is selected, the configure action link is not rendered.
 
-The view selector is displayed in the title header, and it's rendered as a menu of links, displaying the selected view, and the list of available views on hover. The selector can be changed to a list of radio buttons or select field with `conf.config_list.named_views_selector`,per controller, or it can be changed globally in `ActiveScaffold.defaults`:
+The view selector is displayed in the title header, and it's rendered as a menu of links, displaying the selected view, and the list of available views on hover. The selector can be changed to a list of radio buttons or select field with `conf.config_list.named_views_selector`, per controller, or it can be changed globally in `ActiveScaffold.defaults`:
 
 ```rb
 conf.config_list.named_views_selector = :radio  # use radio buttons
 conf.config_list.named_views_selector = :select # use select field
 conf.config_list.named_views_selector = :links  # use a menu of links (default)
+```
+
+The default choice is included in the selector unless `default_view_security_method` is configured. The method runs on the controller and must return true to include that choice. This controls selector visibility; applications must still enforce authorization for the underlying list action.
+
+```rb
+conf.config_list.default_view_security_method = :default_list_view_authorized?
 ```
 
 The position of the views selector can be changed with `conf.config_list.named_views_position`, setting it to `:center` (default, between the title and actions), `:left` (next to the title) or `:right` (at the right of the actions). Although the position of the `div.config-list-views` doesn't change, it just adds a class (center, right or left) and use CSS of flexbox layout to change the position (changing `flex-grow` and `order`). It can be changed per controller or globally in `ActiveScaffold.defaults`:
@@ -89,14 +95,48 @@ conf.config_list.named_views_position = :left
 conf.config_list.named_views_position = :right
 ```
 
-Selectors use the `config_list_view_link`, `config_list_view_select`, `config_list_view_label`, and `config_list_view_radio` UI elements, so applications can customize them through ActiveScaffold's UI registry:
+The selector and configuration form expose their markup through ActiveScaffold's UI registry. Elements rendered with `as_element` have a default tag that applications may replace with `ActiveScaffold.set_element_tag`. Attribute-only entries are applied to tags produced by Rails helpers such as `form_tag`, `select_tag`, or `radio_button_tag`.
+
+Named-view selector elements:
+
+| UI element | Rendered control | Purpose |
+| --- | --- | --- |
+| `config_list_views` | `<div>` | Outer container when the selector is `:links`; it receives `config-list-views` and the configured position class. |
+| `config_list_views_form` | `<form>` attributes | Outer form when the selector is `:radio` or `:select`; use it for layout or behavior classes such as `no-autofocus`. |
+| `config_list_view_selected` | `<div>` | Currently selected view displayed by the links selector. |
+| `config_list_views_list` | `<ul>` | Dropdown list containing the links-selector choices. |
+| `config_list_view_item` | `<li>` | One links-selector choice; the current choice also receives `selected`. |
+| `config_list_view_link` | `<a>` attributes | Remote link that selects a view; its `title` contains the named-view tooltip. |
+| `config_list_view_select` | `<select>` attributes | Select control used by the `:select` selector. |
+| `config_list_view_option` | `<option>` attributes | One option in the select selector; its `title` contains the named-view tooltip. |
+| `config_list_view_label` | `<label>` | Label wrapping a radio and its text; its `title` contains the named-view tooltip. |
+| `config_list_view_radio` | `<input type="radio">` attributes | Radio control used by the `:radio` selector. |
+
+For example:
 
 ```rb
 ActiveScaffold.add_element_attributes(:config_list_view_label, class: 'label text-sm')
 ActiveScaffold.add_element_attributes(:config_list_view_radio, class: 'radio radio-xs')
 ActiveScaffold.add_element_attributes(:config_list_view_link, class: 'link')
 ActiveScaffold.add_element_attributes(:config_list_view_select, class: 'select select-sm')
+ActiveScaffold.add_element_attributes(:config_list_views_form, class: 'no-autofocus')
 ```
+
+Configuration-form elements:
+
+| UI element | Rendered control | Purpose |
+| --- | --- | --- |
+| `config_list_columns` | `<ul>` attributes | Checkbox-list container used to select and order visible columns. |
+| `config_list_column` | `<li>` attributes | One entry in the columns checkbox list; it receives `sortable`. |
+| `config_list_sorting` | `<ol>` | Container for the configurable sorting levels. |
+| `config_list_sorting_item` | `<li>` | One sorting level containing its column and direction controls. |
+| `config_list_sorting_column` | `<select>` attributes | Column selector for one sorting level; it receives `column`. |
+| `config_list_sorting_order` | `<select>` attributes | Ascending/descending selector for one sorting level; it receives `order`. |
+| `config_list_view_name` | `<input type="text">` attributes | Name field used to save or rename a view; core ActiveScaffold text-input attributes are also applied. |
+| `config_list_view_rename` | `<label>` | Rename option wrapper; it receives the `rename-view` class required by the JavaScript behavior. |
+| `config_list_view_rename_checkbox` | `<input type="checkbox">` attributes | Checkbox inside the rename option. |
+| `config_list_view_global` | `<label>` | Global-view option wrapper; it receives the `global-view` class required by the JavaScript behavior. |
+| `config_list_view_global_checkbox` | `<input type="checkbox">` attributes | Checkbox choosing whether a saved view is global. |
 
 ## Saving to DB
 

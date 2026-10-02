@@ -9,6 +9,7 @@ module ActiveScaffold::Config
       @draggable = self.class.draggable
       @named_views_position = self.class.named_views_position
       @named_views_selector = self.class.named_views_selector
+      @default_view_security_method = self.class.default_view_security_method
       @global_views = self.class.global_views
       @named_views = []
     end
@@ -43,6 +44,9 @@ module ActiveScaffold::Config
     # the type of selector for named views, :links, :select or :radio
     cattr_accessor :named_views_selector
     @@named_views_selector = :links
+
+    # method used to check whether the default list view is available
+    cattr_accessor :default_view_security_method
 
     # if saving global views is allowed, or named views are always saved for the current user only
     cattr_accessor :global_views
@@ -83,6 +87,9 @@ module ActiveScaffold::Config
     # the type of selector for named views, :links, :select or :radio
     attr_accessor :named_views_selector
 
+    # method used to check whether the default list view is available
+    attr_accessor :default_view_security_method
+
     # if saving global views is allowed, or named views are always saved for the current user only
     attr_accessor :global_views
 
@@ -115,7 +122,7 @@ module ActiveScaffold::Config
 
     UserSettings.class_eval do
       user_attr :default_columns, :save_to_user, :named_views_method, :draggable,
-                :named_views_position, :named_views_selector, :global_views
+                :named_views_position, :named_views_selector, :default_view_security_method, :global_views
 
       def label
         @conf.label(core: core)

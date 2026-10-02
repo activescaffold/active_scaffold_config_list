@@ -12,6 +12,12 @@ end
 require_relative '../../lib/active_scaffold/helpers/config_list_helpers'
 
 class ConfigListHelpersTest < Minitest::Test
+  class Attributes < Hash
+    def extractable_options?
+      false
+    end
+  end
+
   class BaseHelper
     def ignore_param_for_nested?(key)
       key == :existing_nested_param
@@ -21,7 +27,7 @@ class ConfigListHelpersTest < Minitest::Test
   class Helper < BaseHelper
     include ActiveScaffold::Helpers::ConfigListHelpers
 
-    attr_accessor :selector
+    attr_accessor :default_view_authorized, :default_view_security_method, :selector
     attr_reader :element_calls, :link_calls, :radio_calls, :select_calls
 
     def initialize
@@ -29,24 +35,28 @@ class ConfigListHelpersTest < Minitest::Test
       @link_calls = []
       @radio_calls = []
       @select_calls = []
+      @default_view_authorized = true
       @selector = :radio
     end
 
     def active_scaffold_config
-      Struct.new(:config_list).new(Struct.new(:named_views_selector).new(selector))
+      config_list = Struct.new(:named_views_selector, :default_view_security_method)
+      Struct.new(:config_list).new(config_list.new(selector, default_view_security_method))
     end
 
-    def as_element(key, **options)
+    def as_element(key, content = nil, **options)
       @element_calls << [key, options]
-      yield
+      block_given? ? yield : content
     end
 
     def as_element_attributes(key, **options)
       @element_calls << [key, options]
-      options
+      Attributes.new.merge(options)
     end
 
-    def radio_button_tag(name, value, selected, options)
+    def radio_button_tag(name, value, *args)
+      options = args.last.instance_of?(Hash) ? args.pop : {}
+      selected = args.first || false
       @radio_calls << [name, value, selected, options]
       '<input>'.dup
     end
@@ -89,6 +99,14 @@ class ConfigListHelpersTest < Minitest::Test
       {}
     end
 
+    def controller
+      self
+    end
+
+    def default_view_authorized?
+      default_view_authorized
+    end
+
     def as_(key)
       key.to_s
     end
@@ -123,7 +141,12 @@ class ConfigListHelpersTest < Minitest::Test
 
     helper.config_list_view_options([['Compact', 'compact', 'Fewer columns']], 'compact')
 
-    assert_equal [[:config_list_view_link, {remote: true, title: 'Fewer columns'}]], helper.element_calls
+    assert_equal [
+      [:config_list_view_link, {remote: true, title: 'Fewer columns'}],
+      [:config_list_view_item, {class: 'selected'}],
+      [:config_list_view_selected, {class: 'selected-view'}],
+      [:config_list_views_list, {class: 'views'}]
+    ], helper.element_calls
     assert_equal [['Compact', '/items?config_list_view=compact', {remote: true, title: 'Fewer columns'}]], helper.link_calls
   end
 
@@ -133,8 +156,19 @@ class ConfigListHelpersTest < Minitest::Test
 
     helper.active_scaffold_named_view_selector
 
+    assert_includes helper.element_calls, [:config_list_view_option, {title: 'Fewer columns'}]
     assert_includes helper.element_calls, [:config_list_view_select, {id: nil}]
     assert_equal 'config_list_view', helper.select_calls.first.first
     assert_equal({id: nil}, helper.select_calls.first.last)
+  end
+
+  def test_default_view_can_be_hidden_with_security_method
+    helper = Helper.new
+    helper.default_view_security_method = :default_view_authorized?
+    helper.default_view_authorized = false
+
+    helper.active_scaffold_named_view_selector
+
+    assert_equal ['compact'], helper.radio_calls.map { |call| call[1] }
   end
 end

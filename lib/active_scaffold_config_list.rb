@@ -19,6 +19,16 @@ module ActiveScaffold
   end
 end
 ActiveSupport.run_load_hooks(:active_scaffold_config_list)
-ActiveScaffold.set_element_tag(:config_list_view_label, :label)
+{
+  config_list_views: :div,
+  config_list_view_selected: :div,
+  config_list_views_list: :ul,
+  config_list_view_item: :li,
+  config_list_view_label: :label,
+  config_list_sorting: :ol,
+  config_list_sorting_item: :li,
+  config_list_view_rename: :label,
+  config_list_view_global: :label
+}.each { |name, tag| ActiveScaffold.set_element_tag(name, tag) }
 ActiveScaffold.stylesheets << 'active_scaffold_config_list'
 ActiveScaffold.javascripts << 'active_scaffold_config_list'

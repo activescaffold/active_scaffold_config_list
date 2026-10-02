@@ -20,6 +20,9 @@ module ActiveScaffold::DataStructures
     # custom partial used to render the list for this view
     attr_accessor :view
 
+    # additional information displayed as a title in the view selector
+    attr_accessor :tooltip
+
     def initialize(name, action)
       @name = name.to_s
       @action = action

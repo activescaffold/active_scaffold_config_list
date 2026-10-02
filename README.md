@@ -57,6 +57,12 @@ When `view` is set, the named view renders that partial instead of ActiveScaffol
 
 The columns defined in the view are not required to be in the `conf.list.columns`, so it's possible to add views including columns that are not available in the normal config list.
 
+Set `tooltip` to add a title to the view in the selector:
+
+```rb
+view.tooltip = 'PTO and HR policy'
+```
+
 The security method is a controller method used to check if the view is available for the user, it must return true when the view is allowed:
 
 ```rb
@@ -81,6 +87,15 @@ The position of the views selector can be changed with `conf.config_list.named_v
 conf.config_list.named_views_position = :center
 conf.config_list.named_views_position = :left
 conf.config_list.named_views_position = :right
+```
+
+Selectors use the `config_list_view_link`, `config_list_view_select`, `config_list_view_label`, and `config_list_view_radio` UI elements, so applications can customize them through ActiveScaffold's UI registry:
+
+```rb
+ActiveScaffold.add_element_attributes(:config_list_view_label, class: 'label text-sm')
+ActiveScaffold.add_element_attributes(:config_list_view_radio, class: 'radio radio-xs')
+ActiveScaffold.add_element_attributes(:config_list_view_link, class: 'link')
+ActiveScaffold.add_element_attributes(:config_list_view_select, class: 'select select-sm')
 ```
 
 ## Saving to DB

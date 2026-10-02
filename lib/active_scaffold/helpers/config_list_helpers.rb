@@ -48,7 +48,7 @@ module ActiveScaffold
       def named_views_from_config
         active_scaffold_config.config_list.named_views.filter_map do |view|
           next if view.security_method && !controller.send(view.security_method)
-          [view.label, view.name]
+          [view.label, view.name, view.tooltip]
         end
       end
 
@@ -59,7 +59,8 @@ module ActiveScaffold
         named_views.unshift [as_(:default_view), '']
         html = config_list_view_options(named_views, params[:config_list_view].to_s)
         if active_scaffold_config.config_list.named_views_selector == :select
-          html = select_tag('config_list_view', html, id: nil)
+          select_options = as_element_attributes(:config_list_view_select, id: nil)
+          html = select_tag('config_list_view', html, select_options)
         end
         html
       end
@@ -69,22 +70,27 @@ module ActiveScaffold
         when :links
           url = url_for(params_for(action: :index, config_list_view: '--VIEW--'))
           view = nil
-          links = named_views.map do |(label, name)|
+          links = named_views.map do |label, name, tooltip|
             name ||= label
-            link = link_to(label, url.sub('--VIEW--', ERB::Util.unwrapped_html_escape(name)), remote: true)
+            link_options = as_element_attributes(:config_list_view_link, remote: true, title: tooltip)
+            link = link_to(label, url.sub('--VIEW--', ERB::Util.unwrapped_html_escape(name)), link_options)
             view = label if name == selected
             content_tag :li, link, class: ('selected' if name == selected)
           end
           content_tag(:div, view || as_(:default_view), class: 'selected-view') + content_tag(:ul, safe_join(links), class: 'views')
 
         when :select
-          options_for_select(named_views, selected)
+          options = named_views.map do |label, name, tooltip|
+            [label, name || label, {title: tooltip}.compact]
+          end
+          options_for_select(options, selected)
 
         when :radio
-          buttons = named_views.map do |(label, name)|
+          buttons = named_views.map do |label, name, tooltip|
             name ||= label
-            content_tag(:label) do
-              radio_button_tag('config_list_view', name, name == selected, id: nil) + label
+            radio_options = as_element_attributes(:config_list_view_radio, id: nil)
+            as_element(:config_list_view_label, title: tooltip) do
+              radio_button_tag('config_list_view', name, name == selected, radio_options) + label
             end
           end
           safe_join(buttons)

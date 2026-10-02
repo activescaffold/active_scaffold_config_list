@@ -14,7 +14,9 @@ class NamedViewTest < Minitest::Test
     named_view = ActiveScaffold::DataStructures::NamedView.allocate
 
     named_view.view = 'compact_list'
+    named_view.tooltip = 'Shows fewer columns'
 
     assert_equal 'compact_list', named_view.view
+    assert_equal 'Shows fewer columns', named_view.tooltip
   end
 end

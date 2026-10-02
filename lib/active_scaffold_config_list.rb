@@ -19,5 +19,6 @@ module ActiveScaffold
   end
 end
 ActiveSupport.run_load_hooks(:active_scaffold_config_list)
+ActiveScaffold.set_element_tag(:config_list_view_label, :label)
 ActiveScaffold.stylesheets << 'active_scaffold_config_list'
 ActiveScaffold.javascripts << 'active_scaffold_config_list'

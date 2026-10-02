@@ -17,6 +17,9 @@ module ActiveScaffold::DataStructures
     # default sorting used with this view instead of default
     attr_accessor :sorting
 
+    # custom partial used to render the list for this view
+    attr_accessor :view
+
     def initialize(name, action)
       @name = name.to_s
       @action = action

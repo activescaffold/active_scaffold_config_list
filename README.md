@@ -41,7 +41,7 @@ It's possible to define named views, with a set of columns, so users can switch 
 conf.config_list.add_view :simple, [:number, :status]
 ```
 
-Although it's possible to use a block too, to change other view settings, such as label, sorting and security method. If the label is set, it can be a string, or a symbol to be localized, and the name is used in the URL parameters. When using a block, the columns can be defined in the view instead of the `add_view` call:
+Although it's possible to use a block too, to change other view settings, such as label, sorting, security method and the partial used to render the list. If the label is set, it can be a string, or a symbol to be localized, and the name is used in the URL parameters. When using a block, the columns can be defined in the view instead of the `add_view` call:
 
 ```rb
 conf.config_list.add_view :simple do |view|
@@ -49,8 +49,11 @@ conf.config_list.add_view :simple do |view|
   view.columns = [:number, :status]
   view.sorting = {number: :desc}
   view.security_method = :simple_view_authorized?
+  view.view = 'compact_list'
 end
 ```
+
+When `view` is set, the named view renders that partial instead of ActiveScaffold's default list partial. The custom partial can use the same assigns and helpers as the normal list.
 
 The columns defined in the view are not required to be in the `conf.list.columns`, so it's possible to add views including columns that are not available in the normal config list.
 

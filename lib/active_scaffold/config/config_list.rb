@@ -106,7 +106,8 @@ module ActiveScaffold::Config
       view = ::ActiveScaffold::DataStructures::NamedView.new(name, self)
       view.columns = columns if columns
       yield view if block_given?
-      raise ArgumentError, "no columns defined for view '#{name}'" if view.columns.empty?
+      view.columns ||= [] if view.view
+      raise ArgumentError, "no columns defined for view '#{name}'" if view.view.blank? && view.columns.empty?
 
       @named_views << view
       view

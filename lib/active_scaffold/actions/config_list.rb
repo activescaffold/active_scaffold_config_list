@@ -4,7 +4,7 @@ module ActiveScaffold::Actions
     def self.included(base)
       base.before_action :set_default_view, :set_default_sorting, :change_view, only: [:index]
       base.before_action :config_list_authorized_filter, only: [:show_config_list, :config_list]
-      base.helper_method :config_list_params, :config_list_sorting, :config_list_named_views, :named_view
+      base.helper_method :config_list_params, :config_list_sorting, :config_list_named_views
     end
 
     def show_config_list

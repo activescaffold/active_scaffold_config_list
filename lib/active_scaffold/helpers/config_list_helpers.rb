@@ -13,6 +13,10 @@ module ActiveScaffold
         super || key == :config_list_view
       end
 
+      def named_view
+        controller.send(:named_view) if active_scaffold_config.actions.include?(:config_list)
+      end
+
       def config_list_save_named_views?
         active_scaffold_config.config_list.named_views_method.present?
       end

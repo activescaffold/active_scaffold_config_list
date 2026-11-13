@@ -1,0 +1,20 @@
+<%= as_element :config_list_sorting_item do %>
+  <%= select_tag(
+        "config_list_sorting[#{index}][]",
+        options_for_select(columns_options, selected: selected[index]&.first),
+        as_element_attributes(
+          :config_list_sorting_column,
+          include_blank: as_(:_select_),
+          class: 'column'
+        )
+      ) %>
+  <%= select_tag(
+        "config_list_sorting[#{index}][]",
+        options_for_select(order_options, selected: selected[index]&.last),
+        as_element_attributes(
+          :config_list_sorting_order,
+          include_blank: as_(:_select_),
+          class: 'order'
+        )
+      ) %>
+<% end %>

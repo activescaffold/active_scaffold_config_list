@@ -1,0 +1,4 @@
+<%= as_element :form_element, class: 'form-element' do %>
+  <% content = render 'show_config_list_sorting_fields' %>
+  <%= form_attribute_html(nil, as_(:default_sorting), content, nil, {}) %>
+<% end %>

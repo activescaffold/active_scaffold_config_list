@@ -16,23 +16,17 @@ class ConfigListTest < Minitest::Test
   Config = Struct.new(:config_list)
 
   class Controller
-    def self.before_action(*)
-    end
+    def self.before_action(*); end
 
-    def self.helper_method(*)
-    end
+    def self.helper_method(*); end
 
     include ActiveScaffold::Actions::ConfigList
 
-    attr_reader :params
+    attr_reader :params, :active_scaffold_config
 
     def initialize(view, selected: view.name, default_view: nil)
       @params = {config_list_view: selected}
       @active_scaffold_config = Config.new(ConfigList.new([view], default_view))
-    end
-
-    def active_scaffold_config
-      @active_scaffold_config
     end
 
     public :named_view, :set_default_view

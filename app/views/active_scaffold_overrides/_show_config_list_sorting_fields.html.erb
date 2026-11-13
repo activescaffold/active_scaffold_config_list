@@ -1,0 +1,14 @@
+<%= as_element :config_list_sorting do %>
+  <%
+    columns_options = list_columns.select(&:sortable?).map { |column| [column.label, column.name] }
+    order_options = %w[asc desc].map { |value| [as_(value), value] }
+    selected = config_list_sorting || []
+  %>
+  <% 3.times do |index| %>
+    <%= render 'show_config_list_sorting_item',
+               index: index,
+               columns_options: columns_options,
+               order_options: order_options,
+               selected: selected %>
+  <% end %>
+<% end %>

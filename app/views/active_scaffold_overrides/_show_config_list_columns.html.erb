@@ -1,0 +1,21 @@
+<%= as_element :form_element, class: 'form-element' do %>
+  <%
+    columns_options = as_element_attributes(
+      :config_list_columns,
+      name: 'config_list',
+      id: "#{element_form_id(action: :config_list)}-columns",
+      class: ('sortable-container' unless active_scaffold_config.config_list.draggable)
+    ).to_h
+    content = active_scaffold_checkbox_list(
+      nil,
+      config_list_columns,
+      config_list_params || config_list_columns.map(&:last),
+      columns_options,
+      ui_options: {
+        draggable_lists: active_scaffold_config.config_list.draggable,
+        item_options: as_element_attributes(:config_list_column, class: 'sortable').to_h
+      }
+    )
+  %>
+  <%= form_attribute_html(nil, as_(:columns), content, nil, {}) %>
+<% end %>

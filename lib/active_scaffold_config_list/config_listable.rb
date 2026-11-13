@@ -15,7 +15,8 @@ module ActiveScaffoldConfigList
                            controller_matcher: :controller_name)
         # Define the association
         class_eval do
-          has_many association_name, class_name: model_name, **association_options
+          # model_name is supplied by the DSL caller, so it cannot be a static class name.
+          has_many association_name, class_name: model_name, **association_options # rubocop:disable Rails/ReflectionClassName
         end
 
         model_class = model_name.to_s.classify.constantize
@@ -45,7 +46,8 @@ module ActiveScaffoldConfigList
     module InstanceMethods
       def config_list_for(controller_id, controller_name, view_name: nil, slug: nil, attributes: nil)
         settings = self.class.config_list_settings
-        query = list_configurations_query(controller_id, controller_name, user_views: slug.nil? || slug.to_s.start_with?('user-'))
+        query = list_configurations_query(controller_id, controller_name,
+                                          user_views: slug.nil? || slug.to_s.start_with?('user-'))
 
         if slug
           query = query.where(settings[:slug_column] => slug)

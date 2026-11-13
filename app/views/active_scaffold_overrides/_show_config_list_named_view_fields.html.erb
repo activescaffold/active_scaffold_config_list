@@ -1,0 +1,33 @@
+<% name_options = active_scaffold_input_text_options(required: @config_list_view_name.present?) %>
+<%= text_field_tag(
+      'config_list_view_name',
+      @config_list_view_name.to_s,
+      as_element_attributes(:config_list_view_name, **name_options)
+    ) %>
+<% if @config_list_view_name.present? %>
+  <%= as_element :config_list_view_rename, class: 'rename-view', style: 'display: none;' do %>
+    <%= check_box_tag(
+          'config_list_old_view_name',
+          params[:config_list_view],
+          false,
+          **as_element_attributes(:config_list_view_rename_checkbox, id: nil).to_h
+        ) %>
+    <%= as_ :rename_view, view_name: @config_list_view_name %>
+  <% end %>
+<% end %>
+<% if config_list_global_views? %>
+  <%= as_element(
+        :config_list_view_global,
+        class: 'global-view',
+        style: ('display: none;' if @config_list_view_name.blank?)
+      ) do %>
+    <%= hidden_field_tag 'global_view', @global_view ? '1' : '' %>
+    <%= check_box_tag(
+          'global_view',
+          '1',
+          @global_view,
+          **as_element_attributes(:config_list_view_global_checkbox, id: nil, disabled: true).to_h
+        ) %>
+    <%= as_ :global_view %>
+  <% end %>
+<% end %>

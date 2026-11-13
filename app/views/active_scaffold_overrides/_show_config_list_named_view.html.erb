@@ -1,0 +1,4 @@
+<%= as_element :form_element, class: 'form-element' do %>
+  <% content = render 'show_config_list_named_view_fields' %>
+  <%= form_attribute_html(nil, as_(:view_name), content, nil, {}) %>
+<% end %>

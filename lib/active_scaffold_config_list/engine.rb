@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_scaffold_config_list/config_listable'
 module ActiveScaffoldConfigList
   class Engine < ::Rails::Engine
@@ -10,11 +12,11 @@ module ActiveScaffoldConfigList
 
     initializer 'active_scaffold_config_list.action_view' do
       ActiveSupport.on_load :action_view do
-        ActionView::Base.send :include, ActiveScaffold::Helpers::ConfigListHelpers
+        ActiveSupport.on_load(:action_view) { include ActiveScaffold::Helpers::ConfigListHelpers }
       end
     end
 
-    initializer 'active_scaffold_config_list.active_record' do |app|
+    initializer 'active_scaffold_config_list.active_record' do
       ActiveSupport.on_load :active_record do
         include ActiveScaffoldConfigList::ConfigListable
       end

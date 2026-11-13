@@ -31,6 +31,7 @@ class ConfigListHelpersTest < Minitest::Test
     attr_reader :element_calls, :link_calls, :radio_calls, :select_calls
 
     def initialize
+      super
       @element_calls = []
       @link_calls = []
       @radio_calls = []
@@ -58,7 +59,7 @@ class ConfigListHelpersTest < Minitest::Test
       options = args.last.instance_of?(Hash) ? args.pop : {}
       selected = args.first || false
       @radio_calls << [name, value, selected, options]
-      '<input>'.dup
+      +'<input>'
     end
 
     def link_to(label, url, options)
@@ -169,6 +170,7 @@ class ConfigListHelpersTest < Minitest::Test
 
     helper.active_scaffold_named_view_selector
 
-    assert_equal ['compact'], helper.radio_calls.map { |call| call[1] }
+    selected_views = helper.radio_calls.map { |call| call[1] }
+    assert_equal ['compact'], selected_views
   end
 end

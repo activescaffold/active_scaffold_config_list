@@ -126,6 +126,14 @@ class ConfigListableTest < Minitest::Test
     assert_empty @global_query.calls
   end
 
+  def test_finds_view_by_name_when_slug_is_not_supplied
+    record = @user.config_list_for('session-key', 'tasks', view_name: 'Daily')
+
+    assert_same @association.record, record
+    assert_includes @association.calls, [:where, {name: 'Daily'}]
+    assert_empty @global_query.calls
+  end
+
   def test_global_view_combines_global_and_user_records
     record = @user.config_list_for('session-key', 'tasks', slug: 'global-daily')
 

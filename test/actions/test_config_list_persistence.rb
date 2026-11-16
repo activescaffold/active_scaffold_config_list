@@ -10,6 +10,8 @@ class ConfigListPersistenceTest < Minitest::Test
   ConfigListConfig = Struct.new(:save_to_user, :global_views, :named_views_method, :default_columns)
   ListConfig = Struct.new(:user)
   Config = Struct.new(:config_list, :list)
+  Security = Struct.new(:current_user_method)
+  Config.define_singleton_method(:security) { Security.new(:current_user) }
 
   class Record
     attr_accessor :config_list, :config_list_sorting
@@ -52,6 +54,10 @@ class ConfigListPersistenceTest < Minitest::Test
 
     include ActiveScaffold::Actions::ConfigList
 
+    def self.active_scaffold_config
+      Config.new
+    end
+
     attr_reader :active_scaffold_config, :params, :storage
     attr_accessor :current_user
 
@@ -83,6 +89,19 @@ class ConfigListPersistenceTest < Minitest::Test
            :delete_config_list_params, :save_config_list_params
   end
 
+  class CustomStorageController < Controller
+    attr_reader :custom_storage
+
+    def initialize
+      super
+      @custom_storage = {}
+    end
+
+    def custom_config_list_session_storage
+      custom_storage
+    end
+  end
+
   def test_saves_columns_and_sorting_in_session
     controller = Controller.new
 
@@ -90,6 +109,25 @@ class ConfigListPersistenceTest < Minitest::Test
 
     assert_equal %i[name status], controller.storage['config_list']
     assert_equal [%i[name asc]], controller.storage['config_list_sorting']
+  end
+
+  def test_uses_custom_session_storage_when_controller_defines_it
+    controller = CustomStorageController.new
+
+    controller.save_config_list_params(%w[name status], [%i[name asc]], nil, nil)
+
+    assert_equal %i[name status], controller.custom_storage['config_list']
+    assert_equal [%i[name asc]], controller.custom_storage['config_list_sorting']
+    assert_empty controller.storage
+  end
+
+  def test_default_current_user_uses_configured_security_method
+    controller = Controller.new
+    controller.current_user = User.new
+    current_user_method =
+      ActiveScaffold::Actions::ConfigListPersistence.instance_method(:active_scaffold_current_user)
+
+    assert_same controller.current_user, current_user_method.bind_call(controller)
   end
 
   def test_deleting_session_configuration_clears_columns_sorting_and_active_sort
@@ -135,6 +173,21 @@ class ConfigListPersistenceTest < Minitest::Test
     controller = Controller.new
 
     assert_equal 'Daily', controller.config_list_slug('Daily', true)
+  end
+
+  def test_slug_uses_configured_controller_builder
+    controller = Controller.new
+    controller.active_scaffold_config.config_list.global_views = true
+    controller.define_singleton_method(:custom_slug) do |view_name, global_view|
+      [global_view ? 'shared' : 'personal', view_name.parameterize].join('/')
+    end
+    previous_builder = ActiveScaffold::Config::ConfigList.slug_builder
+    ActiveScaffold::Config::ConfigList.slug_builder = :custom_slug
+
+    assert_equal 'shared/daily-tasks', controller.config_list_slug('Daily Tasks', true)
+    assert_equal 'personal/daily-tasks', controller.config_list_slug('Daily Tasks', false)
+  ensure
+    ActiveScaffold::Config::ConfigList.slug_builder = previous_builder
   end
 
   def test_saves_global_named_view_to_current_user

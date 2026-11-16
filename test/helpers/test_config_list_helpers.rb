@@ -27,7 +27,8 @@ class ConfigListHelpersTest < Minitest::Test
   class Helper < BaseHelper
     include ActiveScaffold::Helpers::ConfigListHelpers
 
-    attr_accessor :selector, :unnamed_view_authorized, :unnamed_view_security_method
+    attr_accessor :config, :controller_object, :selector, :unnamed_view_authorized,
+                  :unnamed_view_security_method
     attr_reader :element_calls, :link_calls, :radio_calls, :select_calls
 
     def initialize
@@ -41,6 +42,8 @@ class ConfigListHelpersTest < Minitest::Test
     end
 
     def active_scaffold_config
+      return config if config
+
       config_list = Struct.new(:named_views_selector, :unnamed_view_security_method)
       Struct.new(:config_list).new(config_list.new(selector, unnamed_view_security_method))
     end
@@ -101,7 +104,7 @@ class ConfigListHelpersTest < Minitest::Test
     end
 
     def controller
-      self
+      controller_object || self
     end
 
     def unnamed_view_authorized?
@@ -116,6 +119,19 @@ class ConfigListHelpersTest < Minitest::Test
       values.join
     end
   end
+
+  Column = Struct.new(:name, :label)
+  Columns = Struct.new(:visible_columns)
+  List = Struct.new(:columns)
+  ConfigList = Struct.new(
+    :named_views_selector,
+    :unnamed_view_security_method,
+    :named_views_method,
+    :named_views,
+    :global_views
+  )
+  Config = Struct.new(:actions, :config_list, :list)
+  NamedView = Struct.new(:label, :name, :tooltip, :security_method)
 
   def test_config_list_view_is_not_copied_to_nested_links
     helper = Helper.new
@@ -179,5 +195,77 @@ class ConfigListHelpersTest < Minitest::Test
 
     selected_views = helper.radio_calls.map { |call| call[1] }
     assert_equal ['compact'], selected_views
+  end
+
+  def test_named_view_delegates_to_controller_when_action_is_enabled
+    helper = Helper.new
+    selected_view = Object.new
+    controller = Object.new
+    controller.define_singleton_method(:named_view) { selected_view }
+    helper.controller_object = controller
+    helper.config = Config.new([:config_list], ConfigList.new, nil)
+
+    assert_same selected_view, helper.named_view
+
+    helper.config.actions.clear
+    assert_nil helper.named_view
+  end
+
+  def test_named_view_capability_predicates_follow_configuration
+    helper = Helper.new
+    config_list = ConfigList.new(:links, nil, :saved_views, [], true)
+    helper.config = Config.new([:config_list], config_list, nil)
+
+    assert helper.config_list_save_named_views?
+    assert helper.config_list_named_views?
+    assert helper.config_list_global_views?
+
+    helper.config.actions.clear
+    refute helper.config_list_named_views?
+    refute helper.config_list_global_views?
+  end
+
+  def test_config_list_columns_appends_unselected_visible_columns
+    helper = Helper.new
+    name = Column.new(:name, 'Name')
+    status = Column.new(:status, 'Status')
+    created_at = Column.new(:created_at, 'Created')
+    helper.config = Config.new(nil, ConfigList.new, List.new(Columns.new([name, status, created_at])))
+    helper.define_singleton_method(:config_list_params) { [:status] }
+    helper.define_singleton_method(:list_columns) { [status] }
+    helper.define_singleton_method(:column_heading_label, &:label)
+
+    assert_equal [['Status', :status], ['Name', :name], ['Created', :created_at]], helper.config_list_columns
+  end
+
+  def test_config_list_columns_uses_list_columns_without_saved_array
+    helper = Helper.new
+    name = Column.new(:name, 'Name')
+    helper.define_singleton_method(:config_list_params) { nil }
+    helper.define_singleton_method(:list_columns) { [name] }
+    helper.define_singleton_method(:column_heading_label, &:label)
+
+    assert_equal [['Name', :name]], helper.config_list_columns
+  end
+
+  def test_user_and_configured_named_views_apply_storage_and_security
+    helper = Helper.new
+    allowed = NamedView.new('Allowed', 'allowed', 'Visible', nil)
+    denied = NamedView.new('Denied', 'denied', 'Hidden', :denied_view?)
+    config_list = ConfigList.new(:links, nil, :saved_views, [allowed, denied], false)
+    helper.config = Config.new([:config_list], config_list, nil)
+    helper.define_singleton_method(:config_list_named_views) { [%w[Personal personal]] }
+    controller = Object.new
+    controller.define_singleton_method(:denied_view?) { false }
+    helper.controller_object = controller
+
+    user_named_views = ActiveScaffold::Helpers::ConfigListHelpers.instance_method(:user_named_views)
+    configured_named_views = ActiveScaffold::Helpers::ConfigListHelpers.instance_method(:named_views_from_config)
+
+    assert_equal [%w[Personal personal]], user_named_views.bind_call(helper)
+    assert_equal [%w[Allowed allowed Visible]], configured_named_views.bind_call(helper)
+
+    config_list.named_views_method = nil
+    assert_empty user_named_views.bind_call(helper)
   end
 end

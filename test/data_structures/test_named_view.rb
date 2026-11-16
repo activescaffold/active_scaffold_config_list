@@ -28,4 +28,12 @@ class NamedViewTest < Minitest::Test
     assert_equal 'compact_list', named_view.view
     assert_equal 'Shows fewer columns', named_view.tooltip
   end
+
+  def test_symbol_label_is_translated
+    named_view = ActiveScaffold::DataStructures::NamedView.new('compact', Action.new(:config_list))
+    named_view.label = :config_list_compact_test_label
+    named_view.define_singleton_method(:as_) { |key| "translated #{key}" }
+
+    assert_equal 'translated config_list_compact_test_label', named_view.label
+  end
 end

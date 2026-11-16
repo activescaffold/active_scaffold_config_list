@@ -10,8 +10,7 @@ gemspec
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
-  gem 'simplecov', '~> 0.22.0', require: false
-  gem 'simplecov_json_formatter', require: false
+  gem 'simplecov', '~> 1.3', require: false
 end
 
 group :lint do

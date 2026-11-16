@@ -125,6 +125,13 @@ class ConfigListHelpersTest < Minitest::Test
     refute helper.ignore_param_for_nested?(:other_param)
   end
 
+  def test_config_list_supports_sorting_and_column_selection
+    helper = Helper.new
+
+    assert helper.config_list_sorting?
+    assert helper.config_list_columns?
+  end
+
   def test_radio_view_uses_ui_elements_and_tooltip
     helper = Helper.new
 

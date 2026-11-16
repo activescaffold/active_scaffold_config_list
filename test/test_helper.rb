@@ -5,3 +5,6 @@ if ENV['COVERAGE'] == 'true'
   SimpleCov.start
 end
 require 'minitest/autorun'
+require 'rails'
+require 'active_scaffold'
+require 'active_scaffold_config_list'

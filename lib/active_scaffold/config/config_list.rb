@@ -132,7 +132,7 @@ module ActiveScaffold::Config
     private
 
     def validate_new_view_name!(name)
-      raise ArgumentError, "view '#{name}' already exists" if @named_views.any? { |view| view.name == name }
+      raise ArgumentError, "view '#{name}' already exists" if @named_views.any? { |view| view.name == name.to_s }
     end
 
     def normalize_view_columns(view)
@@ -140,7 +140,7 @@ module ActiveScaffold::Config
     end
 
     def validate_view_columns!(view)
-      return unless view.view.blank? && view.columns.empty?
+      return unless view.view.blank? && view.columns.blank?
 
       raise ArgumentError, "no columns defined for view '#{view.name}'"
     end

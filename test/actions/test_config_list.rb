@@ -3,23 +3,6 @@
 require 'test_helper'
 require 'active_support/core_ext/object/blank'
 
-module ActiveScaffold
-  unless const_defined?(:ActionNotAllowed)
-    class ActionNotAllowed < StandardError; end
-  end
-
-  module Actions
-  end
-
-  module Config
-    class ConfigList
-      def self.slug_builder
-        nil
-      end
-    end
-  end
-end
-
 require_relative '../../lib/active_scaffold/actions/config_list'
 
 class ConfigListTest < Minitest::Test

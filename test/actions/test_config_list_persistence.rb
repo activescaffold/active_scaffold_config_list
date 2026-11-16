@@ -4,21 +4,6 @@ require 'test_helper'
 require 'active_support/core_ext/enumerable'
 require 'active_support/core_ext/object/blank'
 
-module ActiveScaffold
-  module Actions
-  end
-
-  module Config
-    class ConfigList
-      unless respond_to?(:slug_builder)
-        def self.slug_builder
-          nil
-        end
-      end
-    end
-  end
-end
-
 require_relative '../../lib/active_scaffold/actions/config_list'
 
 class ConfigListPersistenceTest < Minitest::Test

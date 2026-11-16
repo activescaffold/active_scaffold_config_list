@@ -2,22 +2,6 @@
 
 require 'test_helper'
 
-module ActiveScaffold
-  module DataStructures
-    class ActionColumns
-      attr_accessor :action
-
-      def initialize(columns)
-        @columns = columns
-      end
-
-      def to_a
-        @columns
-      end
-    end
-  end
-end
-
 require_relative '../../lib/active_scaffold/data_structures/named_view'
 
 class NamedViewTest < Minitest::Test

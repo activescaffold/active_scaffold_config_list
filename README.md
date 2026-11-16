@@ -1,3 +1,10 @@
+[![Build status](https://github.com/activescaffold/active_scaffold_config_list/actions/workflows/ci.yml/badge.svg)](https://github.com/activescaffold/active_scaffold_config_list/actions/workflows/ci.yml)
+[![Maintainability](https://qlty.sh/gh/activescaffold/projects/active_scaffold_config_list/maintainability.svg)](https://qlty.sh/gh/activescaffold/projects/active_scaffold_config_list)
+[![Code Coverage](https://qlty.sh/gh/activescaffold/projects/active_scaffold_config_list/coverage.svg)](https://qlty.sh/gh/activescaffold/projects/active_scaffold_config_list)
+[![Gem Version](https://badge.fury.io/rb/active_scaffold_config_list.svg)](https://badge.fury.io/rb/active_scaffold_config_list)
+[![Inline docs](https://inch-ci.org/github/activescaffold/active_scaffold_config_list.svg?branch=master)](https://inch-ci.org/github/activescaffold/active_scaffold_config_list)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 This works with Rails >= 5.2 and ActiveScaffold >= 3.7.1  
 Version 3.4.x and 3.5.x worked with Rails >= 4.0 and ActiveScaffold >= 3.4.4  
 Version 3.3.x worked with Rails 3.2 and ActiveScaffold >= 3.4.4  

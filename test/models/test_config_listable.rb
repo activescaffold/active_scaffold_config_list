@@ -1,12 +1,27 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'active_record'
 require 'active_support/concern'
 require 'active_support/core_ext/hash/keys'
 
 require_relative '../../lib/active_scaffold_config_list/config_listable'
 
 class ConfigListableTest < Minitest::Test
+  class DslConfiguration < ActiveRecord::Base
+    self.abstract_class = true
+
+    def self.column_names
+      %w[id owner_id controller_key title config_list]
+    end
+  end
+
+  class DslUser < ActiveRecord::Base
+    self.abstract_class = true
+
+    include ActiveScaffoldConfigList::ConfigListable
+  end
+
   class Record
     attr_accessor :attributes
   end
@@ -157,5 +172,34 @@ class ConfigListableTest < Minitest::Test
     assert_equal [%w[Daily global-daily]], @user.config_list_views('session-key', 'tasks')
     assert_includes @global_query.calls, [:where_not, {name: nil}]
     assert_includes @global_query.calls, [:pluck, %i[name slug]]
+  end
+
+  def test_has_config_lists_defines_association_and_settings
+    DslUser.has_config_lists(
+      DslConfiguration.name,
+      association_name: :saved_views,
+      association_options: {foreign_key: :owner_id, dependent: :destroy},
+      view_name_column: :title,
+      slug_column: :missing_slug,
+      controller_column: :controller_key,
+      controller_matcher: :controller_id
+    )
+
+    reflection = DslUser.reflect_on_association(:saved_views)
+    settings = DslUser.config_list_settings
+
+    assert_equal :has_many, reflection.macro
+    assert_equal DslConfiguration.name, reflection.class_name
+    assert_equal 'owner_id', reflection.foreign_key
+    assert_equal :destroy, reflection.options[:dependent]
+    assert_equal :saved_views, settings[:association_name]
+    assert_equal DslConfiguration, settings[:model_class]
+    assert_equal :title, settings[:view_name_column]
+    assert_nil settings[:slug_column]
+    assert_equal :controller_key, settings[:controller_column]
+    assert_equal :controller_id, settings[:controller_matcher]
+    assert settings.frozen?
+    assert_includes DslUser.included_modules, ActiveScaffoldConfigList::ConfigListable::InstanceMethods
+    assert_includes DslUser.instance_methods, :config_list_for
   end
 end
